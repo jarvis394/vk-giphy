@@ -6,6 +6,7 @@ import {
   GIFS_FETCH_FULFILLED,
   GIFS_FETCH_REJECTED,
 } from '../reducers/gifs/types'
+import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
 
 interface SearchGIFsParams {
   query: string
@@ -22,10 +23,13 @@ export const searchGIFs =
       return Promise.resolve()
     }
 
-    dispatch({ type: GIFS_FETCH, offset })
+    dispatch({ type: GIFS_FETCH, payload: { offset, query } })
 
     try {
-      const { data, pagination } = await gf.search(query)
+      const { data, pagination } = await gf.search(query, {
+        limit: GIPHY_FETCH_GIFS_COUNT,
+        offset,
+      })
 
       dispatch({
         type: GIFS_FETCH_FULFILLED,

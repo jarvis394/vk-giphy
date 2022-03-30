@@ -15,4 +15,5 @@ export interface State {
   fetchError: ErrorResult
   data: Record<number, DataRecord>
   pagination: Result['pagination']
+  query: string
 }

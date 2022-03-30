@@ -1,12 +1,17 @@
 body {
-	margin: 0;
-	background-color: #edeef0;
-	font-family: 'Roboto', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Droid Sans',
-		'Helvetica Neue', sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  background-color: #edeef0;
+  font-family: 'Roboto', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', -apple-system, BlinkMacSystemFont, 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::selection {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }

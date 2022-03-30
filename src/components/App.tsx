@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from '@emotion/styled/macro'
-import TextArea from './blocks/TextArea'
+import TextArea from './Messages/TextArea'
 import { APP_MAX_WIDTH } from 'src/config/constants'
+import Messages from './Messages'
 
 const Root = styled('div')({
   background: '#ffffff',
@@ -21,11 +22,6 @@ const Root = styled('div')({
   },
 })
 
-const MessagesContainer = styled('div')({
-  display: 'flex',
-  flexGrow: 1,
-})
-
 const TextAreaContainer = styled('div')({
   width: '100%',
   background: '#FAFBFC',
@@ -37,10 +33,13 @@ const TextAreaContainer = styled('div')({
 const App = () => {
   return (
     <Root>
-      <MessagesContainer></MessagesContainer>
-      <TextAreaContainer>
-        <TextArea />
-      </TextAreaContainer>
+      <Messages>
+        <Messages.Stack></Messages.Stack>
+        <Messages.Popups />
+        <Messages.TextAreaContainer>
+          <Messages.TextArea />
+        </Messages.TextAreaContainer>
+      </Messages>
     </Root>
   )
 }

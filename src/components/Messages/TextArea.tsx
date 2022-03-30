@@ -1,12 +1,23 @@
-import { keyframes } from '@emotion/react/macro'
 import styled from '@emotion/styled/macro'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import {
   COMMAND_KEYWORDS,
   COMMAND_PREFIX,
   TEXTAREA_MAX_LINES,
 } from 'src/config/constants'
 import { formatNewLine } from 'src/utils/formatNewLine'
+
+interface TextAreaState {
+  message: string
+  messageCommand: string
+}
+type TextAreaProps = {
+  onChange?: (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+    state: TextAreaState
+  ) => void
+  onSubmit?: (state: TextAreaState) => unknown
+} & JSX.IntrinsicElements['textarea']
 
 const PADDING_VERTICAL = 9.5
 const PADDING_HORIZONTAL = 12
@@ -72,10 +83,10 @@ const Message = styled('div')({
 const PlaceholderText = styled('span')({
   fontWeight: 400,
   color: '#828282',
-  transitionDuration: '212ms',
+  transitionDuration: '360ms',
   position: 'absolute',
   top: PADDING_VERTICAL,
-  transitionTimingFunction: 'cubic-bezier(0, 0.5, 0.5, 1)',
+  transitionTimingFunction: 'cubic-bezier(0, 1, 0, 1)',
   [`&.${PLACEHOLDER_CLASSES.hidden}`]: {
     left: PADDING_HORIZONTAL + 16,
     opacity: 0,
@@ -93,16 +104,23 @@ const StyledKeyword = styled('span')({
   WebkitTextFillColor: 'transparent',
 })
 
-const TextArea = ({ ...props }) => {
+const TextArea: React.FC<TextAreaProps> = ({
+  onChange,
+  onSubmit,
+  ...props
+}) => {
   const [message, setMessage] = useState<string>('')
   const [messageCommand, setMessageCommand] = useState<string>()
   const [messageElement, setMessageElement] = useState<JSX.Element>()
-  const shouldRenderPlaceholder = useMemo(
-    () => message?.length === 0,
+  const placeholderClasses = useMemo(
+    () =>
+      message?.length === 0
+        ? PLACEHOLDER_CLASSES.visible
+        : PLACEHOLDER_CLASSES.hidden,
     [message]
   )
 
-  const handleTextAreaInput: React.ChangeEventHandler<HTMLTextAreaElement> = (
+  const handleTextAreaChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
     e
   ) => {
     // No need of sanitizing because text is being inserted safely into page
@@ -136,17 +154,28 @@ const TextArea = ({ ...props }) => {
     setMessageCommand(newMessageCommand)
     setMessage(newMessage)
     setMessageElement(newMessageElement)
-  }
-
-  const handleTextAreaKeyDown: React.KeyboardEventHandler<
-    HTMLTextAreaElement
-  > = (e) => {
-    const keyCode = e.key
-    if (keyCode === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      alert(`Sent message: ${message}!`)
+    if (onChange) {
+      onChange(e, {
+        message: newMessage,
+        messageCommand: newMessageCommand,
+      })
     }
   }
+
+  const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> =
+    useCallback(
+      (e) => {
+        const keyCode = e.key
+        if (onSubmit && keyCode === 'Enter' && !e.shiftKey) {
+          e.preventDefault()
+          onSubmit({
+            message,
+            messageCommand,
+          })
+        }
+      },
+      [message, messageCommand, onSubmit]
+    )
 
   return (
     <Root>
@@ -154,19 +183,14 @@ const TextArea = ({ ...props }) => {
         <InnerTextArea
           role="textbox"
           aria-multiline="true"
-          onChange={handleTextAreaInput}
-          onKeyDown={handleTextAreaKeyDown}
           aria-placeholder="Напишите сообщение..."
+          onChange={handleTextAreaChange}
+          onKeyDown={handleTextAreaKeyDown}
+          {...props}
         />
         <Message>
           {messageElement}
-          <PlaceholderText
-            className={
-              shouldRenderPlaceholder
-                ? PLACEHOLDER_CLASSES.visible
-                : PLACEHOLDER_CLASSES.hidden
-            }
-          >
+          <PlaceholderText className={placeholderClasses}>
             Напишите сообщение...
           </PlaceholderText>
         </Message>

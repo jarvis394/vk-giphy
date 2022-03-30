@@ -1,7 +1,10 @@
 import { useContext } from 'react'
-import { MessagesContext } from 'src/components/Messages'
+import { MessagesContext, MessagesState } from 'src/components/Messages'
 
-const useMessagesContext = () => {
+const useMessagesContext = (): [
+  MessagesState,
+  React.Dispatch<React.SetStateAction<MessagesState>>
+] => {
   const context = useContext(MessagesContext)
 
   if (!context) {
@@ -10,7 +13,7 @@ const useMessagesContext = () => {
     )
   }
 
-  return context
+  return [context.context, context.setContext]
 }
 
 export default useMessagesContext

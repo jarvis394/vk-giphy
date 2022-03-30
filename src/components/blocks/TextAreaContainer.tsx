@@ -1,5 +1,5 @@
-import styled from '@emotion/styled/macro'
 import React from 'react'
+import styled from '@emotion/styled/macro'
 
 const Root = styled('div')({
   width: '100%',

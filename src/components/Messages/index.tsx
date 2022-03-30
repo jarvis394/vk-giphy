@@ -1,18 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Stack from './Stack'
-import TextAreaContainer from './TextAreaContainer'
 import TextArea from './TextArea'
 import Popups from './Popups'
 
-export const MessagesContext = React.createContext(undefined)
+export interface MessagesState {
+  command: string
+  message: string
+}
+
+export const MessagesContext = React.createContext<{
+  context: MessagesState
+  setContext: React.Dispatch<React.SetStateAction<MessagesState>>
+}>(undefined)
 
 const Messages = ({ children }) => {
+  const [context, setContext] = useState<MessagesState>({
+    command: null,
+    message: '',
+  })
+
   return (
-    <MessagesContext.Provider value={null}>{children}</MessagesContext.Provider>
+    <MessagesContext.Provider
+      value={{
+        context,
+        setContext,
+      }}
+    >
+      {children}
+    </MessagesContext.Provider>
   )
 }
 
-Messages.TextAreaContainer = TextAreaContainer
 Messages.TextArea = TextArea
 Messages.Popups = Popups
 Messages.Stack = Stack

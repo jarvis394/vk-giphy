@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from '@emotion/styled/macro'
 import { GIFPopup } from 'src/components/Popups'
+import useMessagesContext from 'src/hooks/useMessagesContext'
 
 const Wrapper = styled('div')({
   position: 'relative',
@@ -10,9 +11,11 @@ const Wrapper = styled('div')({
 })
 
 const Popups = () => {
+  const [messagesContext] = useMessagesContext()
+
   return (
     <Wrapper>
-      <GIFPopup />
+      {messagesContext.command === 'gif' && <GIFPopup />}
     </Wrapper>
   )
 }

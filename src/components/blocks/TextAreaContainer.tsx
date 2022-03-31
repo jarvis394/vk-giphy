@@ -13,4 +13,4 @@ const TextAreaContainer = ({ children }) => {
   return <Root>{children}</Root>
 }
 
-export default TextAreaContainer
+export default React.memo(TextAreaContainer)

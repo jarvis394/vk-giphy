@@ -163,4 +163,4 @@ const EnterQuery = () => {
   )
 }
 
-export default EnterQuery
+export default React.memo(EnterQuery)

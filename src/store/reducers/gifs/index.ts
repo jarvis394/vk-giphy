@@ -2,6 +2,7 @@ import produce from 'immer'
 import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
 import { FetchingState } from 'src/types'
 import {
+  GIFS_IDLE,
   GIFS_FETCH,
   GIFS_FETCH_FULFILLED,
   GIFS_FETCH_REJECTED,
@@ -23,6 +24,16 @@ const initialState: State = {
 
 export default produce((draft, { type, payload }) => {
   switch (type) {
+    case GIFS_IDLE:
+      draft.state = FetchingState.Idle
+      draft.fetchError = null
+      draft.query = null
+      draft.pagination = {
+        count: GIPHY_FETCH_GIFS_COUNT,
+        offset: 0,
+        total_count: null,
+      }
+      break
     case GIFS_FETCH:
       draft.state = FetchingState.Fetching
       draft.source = payload.source

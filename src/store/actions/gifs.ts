@@ -4,14 +4,21 @@ import {
   GIFS_FETCH,
   GIFS_FETCH_FULFILLED,
   GIFS_FETCH_REJECTED,
+  GIFS_IDLE,
 } from '../reducers/gifs/types'
 import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
 import * as api from 'src/api'
 import axios from 'axios'
+import { FetchingState } from 'src/types'
 
 interface SearchGIFsParams {
   query: string
   offset?: number
+}
+
+export const flushGIFs = () => async (dispatch, getState: () => RootState) => {
+  const shouldDispatch = getState().gifs.state !== FetchingState.Idle
+  shouldDispatch && dispatch({ type: GIFS_IDLE })
 }
 
 export const searchGIFs =

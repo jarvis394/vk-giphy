@@ -104,31 +104,28 @@ const StyledSkeleton = styled(Skeleton)({
   },
 })
 
-const Skeletons = () => {
-  return (
-    <>
-      <StyledSkeleton className="horizontal" />
-      <StyledSkeleton className="horizontal" />
-      <StyledSkeleton />
-      <StyledSkeleton className="horizontal" />
-      <StyledSkeleton />
-    </>
-  )
-}
+const Skeletons = () => (
+  <>
+    <StyledSkeleton className="horizontal" />
+    <StyledSkeleton className="horizontal" />
+    <StyledSkeleton />
+    <StyledSkeleton className="horizontal" />
+    <StyledSkeleton />
+  </>
+)
 
 const ImageGrid: React.FC<{
   query: string
-  isTyping: boolean
-}> = ({ query, isTyping }) => {
+}> = ({ query }) => {
   const data = useSelector((store) => store.gifs.data)
   const state = useSelector((store) => store.gifs.state)
   const shouldHideResults = useMemo(
-    () => state !== FetchingState.Fetched || isTyping,
-    [isTyping, state]
+    () => state !== FetchingState.Fetched,
+    [state]
   )
   const shouldShowResults = useMemo(
-    () => state === FetchingState.Fetched && !isTyping,
-    [isTyping, state]
+    () => state === FetchingState.Fetched,
+    [state]
   )
   const flatData = useMemo(() => {
     if (shouldHideResults) return null

@@ -4,12 +4,16 @@ import useSelector from 'src/hooks/useSelector'
 import { FetchingState } from 'src/types'
 import Spinner from 'src/components/blocks/Spinner'
 import Skeleton from 'src/components/blocks/Skeleton'
+import NoResults from './NoResults'
+import Error from './Error'
 
 const Root = styled('div')<{ isLoading: boolean }>(({ isLoading }) => ({
   overflow: isLoading ? 'hidden' : 'scroll',
   height: '100%',
   width: 'auto',
   margin: '0 6px',
+  display: 'flex',
+  flexDirection: 'column',
   '&::-webkit-scrollbar': {
     background: 'transparent',
     width: 6,
@@ -56,8 +60,7 @@ const Grid = styled('div')({
   gridAutoRows: 118,
   gridGap: 8,
   gridAutoFlow: 'dense',
-  padding: '0 6px',
-  margin: '12px 0',
+  padding: '12px 6px',
 })
 
 const Item = styled('picture')({
@@ -120,7 +123,7 @@ const ImageGrid: React.FC<{
   const data = useSelector((store) => store.gifs.data)
   const state = useSelector((store) => store.gifs.state)
   const shouldHideResults = useMemo(
-    () => state !== FetchingState.Fetched,
+    () => state !== FetchingState.Fetched && state !== FetchingState.Error,
     [state]
   )
   const shouldShowResults = useMemo(
@@ -149,9 +152,12 @@ const ImageGrid: React.FC<{
           <HeaderText>Результаты по запросу {'"' + query + '"'}</HeaderText>
         )}
       </Header>
+      {state === FetchingState.Error && <Error />}
+      {shouldShowResults && flatData.length === 0 && <NoResults />}
       <Grid>
         {shouldHideResults && <Skeletons />}
         {shouldShowResults &&
+          flatData.length !== 0 &&
           flatData.map((e, i) => (
             <Item
               key={i}

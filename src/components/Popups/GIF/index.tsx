@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Popup } from '..'
 import EnterQueryScreen from './EnterQuery'
 import ImageGridScreen from './ImageGrid'
 import { useDispatch } from 'react-redux'
 import { searchGIFs, flushGIFs } from 'src/store/actions/gifs'
 import useSelector from 'src/hooks/useSelector'
+import QueryTooLongScreen from './QueryTooLong'
+import { GIPHY_MAX_QUERY_LENGTH } from 'src/config/constants'
 
 const GIFPopup: React.FC<{
   query: string
@@ -29,7 +31,10 @@ const GIFPopup: React.FC<{
   return (
     <Popup>
       {!query && <EnterQueryScreen />}
-      {query && <ImageGridScreen query={query} />}
+      {query && query.length > GIPHY_MAX_QUERY_LENGTH && <QueryTooLongScreen />}
+      {query && query.length <= GIPHY_MAX_QUERY_LENGTH && (
+        <ImageGridScreen query={query} />
+      )}
     </Popup>
   )
 }

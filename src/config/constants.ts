@@ -12,6 +12,7 @@ export const TEXTAREA_MAX_LINES = 10
 //       Load a small amount at the beginning and a lot afterwards.
 /** Amount of gifs being fetched at once */
 export const GIPHY_FETCH_GIFS_COUNT = 50
+export const GIPHY_MAX_QUERY_LENGTH = 50
 
 /** Time before data in store revalidates */
 export const DEFAULT_UPDATE_INTERVAL = 3600

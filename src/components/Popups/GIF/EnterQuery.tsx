@@ -93,15 +93,15 @@ const widthAnimation = keyframes`
   }
 `
 
-const Centered = styled('div')({
+export const Centered = styled('div')({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: '100%',
+  flexGrow: 1,
   flexDirection: 'column',
 })
 
-const Title = styled('h1')({
+export const Title = styled('h1')({
   fontSize: 16,
   margin: 0,
   marginBottom: 6,
@@ -109,7 +109,7 @@ const Title = styled('h1')({
   color: '#868B8F',
 })
 
-const Subtitle = styled('span')({
+export const Subtitle = styled('span')({
   fontSize: 13,
   margin: 0,
   fontWeight: 400,

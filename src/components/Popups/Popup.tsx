@@ -12,6 +12,8 @@ const Root = styled('div')({
   maxWidth: 428,
   height: 248,
   width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
   [`@media (max-width: ${APP_MAX_WIDTH}px)`]: {
     maxWidth: '100%',
     height: 248,

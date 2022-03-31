@@ -1,5 +1,6 @@
 import { FetchingState } from 'src/types'
 import { ErrorResult, GifsResult, Result } from '@giphy/js-fetch-api'
+import { AxiosError, CancelTokenSource } from 'axios'
 
 const PREFIX = 'GIFS_'
 export const GIFS_FETCH = PREFIX + 'FETCH'
@@ -12,8 +13,9 @@ interface DataRecord {
 }
 export interface State {
   state: FetchingState
-  fetchError: ErrorResult
+  fetchError: AxiosError<ErrorResult>
   data: Record<number, DataRecord>
   pagination: Result['pagination']
   query: string
+  source: CancelTokenSource
 }

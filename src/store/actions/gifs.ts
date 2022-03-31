@@ -1,12 +1,13 @@
 import { RootState } from '..'
 import shouldUpdate from 'src/utils/shouldUpdate'
-import gf from 'src/config/giphyFetch'
 import {
   GIFS_FETCH,
   GIFS_FETCH_FULFILLED,
   GIFS_FETCH_REJECTED,
 } from '../reducers/gifs/types'
 import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
+import * as api from 'src/api'
+import axios from 'axios'
 
 interface SearchGIFsParams {
   query: string
@@ -26,19 +27,39 @@ export const searchGIFs =
       return Promise.resolve()
     }
 
-    dispatch({ type: GIFS_FETCH, payload: { offset, query } })
+    // Cancel previous request if found
+    if (storeData.source) {
+      storeData.source.cancel()
+    }
+
+    const source = axios.CancelToken.source()
+    dispatch({ type: GIFS_FETCH, payload: { offset, query, source } })
 
     try {
-      const { data, pagination } = await gf.search(query, {
+      const response = await api.search({
+        query,
         limit: GIPHY_FETCH_GIFS_COUNT,
         offset,
+        requestOptions: {
+          cancelToken: source.token,
+        },
       })
 
-      dispatch({
-        type: GIFS_FETCH_FULFILLED,
-        payload: { data, pagination, query },
-      })
+      if (response) {
+        dispatch({
+          type: GIFS_FETCH_FULFILLED,
+          payload: {
+            data: response.data,
+            pagination: response.pagination,
+            query,
+          },
+        })
+      }
     } catch (error) {
+      if (axios.isCancel(error)) {
+        return
+      }
+
       dispatch({
         type: GIFS_FETCH_REJECTED,
         payload: { data: error, query },

@@ -1,3 +1,5 @@
+export const GIPHY_API_URL = 'https://api.giphy.com/v1/gifs/'
+
 export const COMMAND_PREFIX = '/'
 
 /** Holds all supported keywords for commands */

@@ -4,7 +4,6 @@ import { Provider } from 'react-redux'
 import App from 'src/components/App'
 import store from './store'
 import 'src/styles/index.css'
-import 'simplebar/dist/simplebar.min.css'
 
 ReactDOM.render(
   <React.StrictMode>

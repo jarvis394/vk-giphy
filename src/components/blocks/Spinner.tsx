@@ -14,12 +14,12 @@ const spinnerAnimation = keyframes`
     transform: rotate(360deg);
   }
 `
-const StyledSpinner = styled(Icon24Spinner)(({ theme }) => ({
+const StyledSpinner = styled(Icon24Spinner)({
   animation: `${spinnerAnimation} 1.1s infinite linear`,
-}))
+})
 
 const Spinner: React.FC<Icon24SpinnerProps> = ({ ...props }) => {
   return <StyledSpinner {...props} />
 }
 
-export default Spinner
+export default React.memo(Spinner)

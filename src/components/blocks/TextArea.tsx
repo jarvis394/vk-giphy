@@ -210,4 +210,4 @@ const TextArea: React.FC<TextAreaProps> = ({
   )
 }
 
-export default TextArea
+export default React.memo(TextArea)

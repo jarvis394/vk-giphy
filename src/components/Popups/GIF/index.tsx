@@ -24,7 +24,7 @@ const GIFPopup: React.FC<{
           })
         )
       }
-    }, 500)
+    }, 400)
     return () => clearTimeout(id)
   }, [query])
 

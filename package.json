@@ -5,8 +5,8 @@
 	"dependencies": {
 		"@emotion/react": "^11.8.2",
 		"@emotion/styled": "^11.8.1",
-		"@giphy/js-fetch-api": "^4.1.2",
 		"@vkontakte/icons": "^1.147.0",
+		"axios": "^0.26.1",
 		"immer": "^9.0.12",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
@@ -16,7 +16,7 @@
 		"redux": "^4.1.2",
 		"redux-logger": "^3.0.6",
 		"redux-thunk": "^2.4.1",
-		"simplebar-react": "^2.3.6"
+		"tiny-skeleton-loader-react": "^1.1.8"
 	},
 	"scripts": {
 		"start": "react-scripts start",
@@ -43,6 +43,7 @@
 		]
 	},
 	"devDependencies": {
+		"@giphy/js-fetch-api": "^4.1.2",
 		"@testing-library/jest-dom": "^5.16.3",
 		"@testing-library/react": "^12.1.4",
 		"@testing-library/user-event": "^13.5.0",

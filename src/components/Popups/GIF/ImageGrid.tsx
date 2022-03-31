@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import styled from '@emotion/styled/macro'
 import useSelector from 'src/hooks/useSelector'
-import SimpleBar from 'simplebar-react'
 import { FetchingState } from 'src/types'
 import Spinner from 'src/components/blocks/Spinner'
+import Skeleton from 'src/components/blocks/Skeleton'
 
-const Root = styled('div')({
-  overflow: 'scroll',
+const Root = styled('div')<{ isLoading: boolean }>(({ isLoading }) => ({
+  overflow: isLoading ? 'hidden' : 'scroll',
   height: '100%',
   width: 'auto',
   margin: '0 6px',
@@ -26,7 +26,7 @@ const Root = styled('div')({
   '&::-webkit-scrollbar-track': {
     margin: '6px 0',
   },
-})
+}))
 
 const Header = styled('div')({
   display: 'flex',
@@ -41,6 +41,9 @@ const HeaderText = styled('p')({
   color: '#B0B5BA',
   fontSize: 13,
   fontWeight: 500,
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
 })
 
 const StyledSpinner = styled(Spinner)({
@@ -90,27 +93,54 @@ const Item = styled('picture')({
   },
 })
 
+const StyledSkeleton = styled(Skeleton)({
+  borderRadius: 2,
+  height: 118,
+  '&.vertical': {
+    gridColumnEnd: 'span 1',
+  },
+  '&.horizontal': {
+    gridColumnEnd: 'span 2',
+  },
+})
+
+const Skeletons = () => {
+  return (
+    <>
+      <StyledSkeleton className="horizontal" />
+      <StyledSkeleton className="horizontal" />
+      <StyledSkeleton />
+      <StyledSkeleton className="horizontal" />
+      <StyledSkeleton />
+    </>
+  )
+}
+
 const ImageGrid: React.FC<{
   query: string
   isTyping: boolean
 }> = ({ query, isTyping }) => {
   const data = useSelector((store) => store.gifs.data)
   const state = useSelector((store) => store.gifs.state)
-  const isLoading = useMemo(
-    () => state === FetchingState.Fetching || isTyping,
+  const shouldHideResults = useMemo(
+    () => state !== FetchingState.Fetched || isTyping,
+    [isTyping, state]
+  )
+  const shouldShowResults = useMemo(
+    () => state === FetchingState.Fetched && !isTyping,
     [isTyping, state]
   )
   const flatData = useMemo(() => {
-    if (isLoading) return null
+    if (shouldHideResults) return null
     return Object.values(data)
       .map((e) => e.gifs)
       .flat()
-  }, [isLoading])
+  }, [shouldHideResults])
 
   return (
-    <Root>
+    <Root isLoading={shouldHideResults}>
       <Header>
-        {isLoading && (
+        {shouldHideResults && (
           <>
             <StyledSpinner width={16} height={16} />
             <HeaderText>
@@ -118,12 +148,13 @@ const ImageGrid: React.FC<{
             </HeaderText>
           </>
         )}
-        {!isLoading && (
+        {shouldShowResults && (
           <HeaderText>Результаты по запросу {'"' + query + '"'}</HeaderText>
         )}
       </Header>
       <Grid>
-        {flatData &&
+        {shouldHideResults && <Skeletons />}
+        {shouldShowResults &&
           flatData.map((e, i) => (
             <Item
               key={i}
@@ -147,4 +178,4 @@ const ImageGrid: React.FC<{
   )
 }
 
-export default ImageGrid
+export default React.memo(ImageGrid)

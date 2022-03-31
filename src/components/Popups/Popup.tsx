@@ -28,4 +28,4 @@ const Popup = ({ children, ...props }) => {
   return <Root {...props}>{children}</Root>
 }
 
-export default Popup
+export default React.memo(Popup)

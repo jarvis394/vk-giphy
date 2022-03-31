@@ -191,8 +191,10 @@ const TextArea: React.FC<TextAreaProps> = ({
       <Wrapper>
         <InnerTextArea
           role="textbox"
+          autoFocus
           aria-multiline="true"
           aria-placeholder="Напишите сообщение..."
+          aria-label="Ввод сообщения"
           onChange={handleTextAreaChange}
           onKeyDown={handleTextAreaKeyDown}
           {...props}

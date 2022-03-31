@@ -19,7 +19,10 @@ export const searchGIFs =
     const storeState = getState()
     const storeData = storeState.gifs
 
-    if (!shouldUpdate(storeData.data[offset]?.lastUpdated)) {
+    if (
+      query === storeData.query &&
+      !shouldUpdate(storeData.data[offset]?.lastUpdated)
+    ) {
       return Promise.resolve()
     }
 

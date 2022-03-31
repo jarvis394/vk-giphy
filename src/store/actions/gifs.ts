@@ -36,12 +36,12 @@ export const searchGIFs =
 
       dispatch({
         type: GIFS_FETCH_FULFILLED,
-        payload: { data, pagination },
+        payload: { data, pagination, query },
       })
     } catch (error) {
       dispatch({
         type: GIFS_FETCH_REJECTED,
-        payload: { data: error },
+        payload: { data: error, query },
       })
     }
   }

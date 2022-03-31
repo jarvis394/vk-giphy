@@ -18,7 +18,6 @@ const GIFPopup: React.FC<{
     const id = setTimeout(() => {
       setIsTyping(false)
       if (storeQuery !== query && query !== '') {
-        console.log('Fetching query:', query, '| store query:', storeQuery)
         dispatch(
           searchGIFs({
             query,

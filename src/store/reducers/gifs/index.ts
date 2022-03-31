@@ -30,6 +30,11 @@ export default produce((draft, { type, payload }) => {
       draft.query = payload.query
       break
     case GIFS_FETCH_FULFILLED:
+      // Reject fetched data for another query
+      // Happens when data is almost loaded and user changes the query
+      // TODO: do proper request cancelling instead of this hack
+      if (payload.query !== draft.query) return
+
       draft.state = FetchingState.Fetched
       draft.data[payload.pagination.offset] = {
         gifs: payload.data,

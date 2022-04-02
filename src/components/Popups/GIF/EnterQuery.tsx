@@ -63,6 +63,7 @@ const textCarousel = keyframes`
   }
 `
 
+// TODO: might be better to dynamically get these values
 const widthAnimation = keyframes`
   0% {
     width: 70.53px;

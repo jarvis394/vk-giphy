@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import styled from '@emotion/styled/macro'
 import useSelector from 'src/hooks/useSelector'
 import { FetchingState } from 'src/types'
@@ -6,6 +6,11 @@ import Spinner from 'src/components/blocks/Spinner'
 import Skeleton from 'src/components/blocks/Skeleton'
 import NoResults from './NoResults'
 import Error from './Error'
+import isVerticalImage from 'src/utils/isVerticalImage'
+import { useDispatch } from 'react-redux'
+import { searchGIFs } from 'src/store/actions/gifs'
+import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
+import useInfiniteScroll from 'src/hooks/useInfiniteScroll'
 
 const Root = styled('div')<{ isLoading: boolean }>(({ isLoading }) => ({
   overflow: isLoading ? 'hidden' : 'scroll',
@@ -82,9 +87,15 @@ const Item = styled('picture')({
   },
   '&.vertical': {
     gridColumnEnd: 'span 1',
+    '@media (max-width: 350px)': {
+      gridColumnEnd: 'span 2',
+    },
   },
   '&.horizontal': {
     gridColumnEnd: 'span 2',
+  },
+  '&.no-border::after': {
+    content: 'none',
   },
   '& img': {
     objectFit: 'cover',
@@ -120,27 +131,54 @@ const Skeletons = () => (
 const ImageGrid: React.FC<{
   query: string
 }> = ({ query }) => {
+  const storePagination = useSelector((store) => store.gifs.pagination)
+  const storeQuery = useSelector((store) => store.gifs.query)
   const data = useSelector((store) => store.gifs.data)
   const state = useSelector((store) => store.gifs.state)
-  const shouldHideResults = useMemo(
-    () => state !== FetchingState.Fetched && state !== FetchingState.Error,
-    [state]
-  )
-  const shouldShowResults = useMemo(
-    () => state === FetchingState.Fetched,
-    [state]
-  )
+  const [currentOffset, setCurrentOffset] = useState(0)
+  const hasNext = currentOffset < storePagination.total_count
+  const handleLoadMoreGIFs = useCallback(() => {
+    setCurrentOffset((prev) => {
+      dispatch(
+        searchGIFs({
+          offset: prev + GIPHY_FETCH_GIFS_COUNT,
+          query,
+        })
+      )
+      return prev + GIPHY_FETCH_GIFS_COUNT
+    })
+  }, [query, currentOffset])
+  const scrollEndRef = useInfiniteScroll({
+    loading: state === FetchingState.Fetching,
+    rootMargin: '0px 0px 0px 0px',
+    hasNext,
+    onLoadMore: handleLoadMoreGIFs,
+  })
+  const dispatch = useDispatch()
+  const shouldShowResults =
+    (state === FetchingState.Fetched && query === storeQuery) ||
+    (state === FetchingState.Fetching && currentOffset !== 0)
   const flatData = useMemo(() => {
-    if (shouldHideResults) return null
-    return Object.values(data)
-      .map((e) => e.gifs)
-      .flat()
-  }, [shouldHideResults])
+    let res = []
+    if (!shouldShowResults) return null
+    Object.keys(data).forEach((e) => (res = res.concat(data[e].gifs)))
+    return res
+  }, [shouldShowResults, Object.keys(data)])
+  // Finds how many skeleton items we need to insert at the end
+  // of the image grid
+  const skeletonsLastLineCount = useMemo(() => {
+    let c = 0
+    if (!flatData) return 0
+    flatData.forEach((e) => {
+      c += isVerticalImage(e.images.fixed_height_small) ? 1 : 2
+    })
+    return Math.ceil(c / 4) * 4 - c
+  }, [flatData])
 
   return (
-    <Root isLoading={shouldHideResults}>
+    <Root isLoading={!shouldShowResults}>
       <Header>
-        {shouldHideResults && (
+        {!shouldShowResults && (
           <>
             <StyledSpinner width={16} height={16} />
             <HeaderText>
@@ -155,18 +193,15 @@ const ImageGrid: React.FC<{
       {state === FetchingState.Error && <Error />}
       {shouldShowResults && flatData.length === 0 && <NoResults />}
       <Grid>
-        {shouldHideResults && <Skeletons />}
+        {!shouldShowResults && <Skeletons />}
         {shouldShowResults &&
-          flatData.length !== 0 &&
           flatData.map((e, i) => (
             <Item
               key={i}
               className={
-                e.images.fixed_height_small.width /
-                  e.images.fixed_height_small.height >
-                1
-                  ? 'horizontal'
-                  : 'vertical'
+                isVerticalImage(e.images.fixed_height_small)
+                  ? 'vertical'
+                  : 'horizontal'
               }
             >
               <source
@@ -176,6 +211,16 @@ const ImageGrid: React.FC<{
               <img src={e.images.fixed_height_small.url} alt="" />
             </Item>
           ))}
+        {shouldShowResults && flatData?.length !== 0 && hasNext && (
+          <>
+            {new Array(skeletonsLastLineCount).fill(0).map((_, i) => (
+              <StyledSkeleton key={i} {...(i == 0 && { ref: scrollEndRef })} />
+            ))}
+            <StyledSkeleton />
+            <StyledSkeleton className="horizontal" />
+            <StyledSkeleton />
+          </>
+        )}
       </Grid>
     </Root>
   )

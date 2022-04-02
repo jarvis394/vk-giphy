@@ -37,8 +37,13 @@ const Root = styled('span')({
   },
 })
 
-const Skeleton = ({ ...props }) => {
-  return <Root {...props}>&zwnj;</Root>
-}
+// eslint-disable-next-line react/display-name
+const Skeleton = React.forwardRef<HTMLDivElement, JSX.IntrinsicElements['div']>(
+  (props, ref) => (
+    <Root {...props} ref={ref}>
+      &zwnj;
+    </Root>
+  )
+)
 
 export default React.memo(Skeleton)

@@ -16,6 +16,7 @@ const spinnerAnimation = keyframes`
 `
 const StyledSpinner = styled(Icon24Spinner)({
   animation: `${spinnerAnimation} 1.1s infinite linear`,
+  borderRadius: '50%',
 })
 
 const Spinner: React.FC<Icon24SpinnerProps> = ({ ...props }) => {

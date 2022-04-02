@@ -43,10 +43,12 @@ export const searchGIFs =
     dispatch({ type: GIFS_FETCH, payload: { offset, query, source } })
 
     try {
+      const language = window && window.navigator.language.split('-')[0]
       const response = await api.search({
         query,
         limit: GIPHY_FETCH_GIFS_COUNT,
         offset,
+        lang: language,
         requestOptions: {
           cancelToken: source.token,
         },

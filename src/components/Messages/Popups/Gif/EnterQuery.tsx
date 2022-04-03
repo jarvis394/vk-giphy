@@ -1,7 +1,12 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { keyframes } from '@emotion/react/macro'
 import styled from '@emotion/styled/macro'
 import { EMOJI_LIST } from 'src/config/constants'
+import useMessagesContext from 'src/hooks/useMessagesContext'
+import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
+import Centered from 'src/components/blocks/Centered'
+import Subtitle from 'src/components/blocks/Subtitle'
+import Title from 'src/components/blocks/Title'
 
 const emojisCarousel = keyframes`
   0% {
@@ -94,29 +99,6 @@ const widthAnimation = keyframes`
   }
 `
 
-export const Centered = styled('div')({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexGrow: 1,
-  flexDirection: 'column',
-})
-
-export const Title = styled('h1')({
-  fontSize: 16,
-  margin: 0,
-  marginBottom: 6,
-  fontWeight: 600,
-  color: '#868B8F',
-})
-
-export const Subtitle = styled('span')({
-  fontSize: 13,
-  margin: 0,
-  fontWeight: 400,
-  color: '#B0B5BA',
-})
-
 const Emoji = styled('div')({
   width: 56,
   height: 56,
@@ -147,6 +129,15 @@ const EmojiTextBox = styled('span')({
 })
 
 const EnterQuery = () => {
+  const [messagesContext] = useMessagesContext()
+  const query = useMemo(
+    () => getArgsFromMessagesContext(messagesContext) || '',
+    [messagesContext.message]
+  )
+
+  // Do not show this screen if user entered the query
+  if (query) return null
+
   return (
     <Centered>
       <Emoji />

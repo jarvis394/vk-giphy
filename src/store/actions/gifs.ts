@@ -1,5 +1,4 @@
 import { RootState } from '..'
-import shouldUpdate from 'src/utils/shouldUpdate'
 import {
   GIFS_FETCH,
   GIFS_FETCH_FULFILLED,
@@ -26,13 +25,6 @@ export const searchGIFs =
     const { query, offset = 0 } = params
     const storeState = getState()
     const storeData = storeState.gifs
-
-    if (
-      query === storeData.query &&
-      !shouldUpdate(storeData.data[offset]?.lastUpdated)
-    ) {
-      return Promise.resolve()
-    }
 
     // Cancel previous request if found
     if (storeData.source) {

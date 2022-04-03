@@ -1,6 +1,6 @@
 import produce from 'immer'
 import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
-import { FetchingState } from 'src/types'
+import { FetchingState, ShowState } from 'src/types'
 import {
   GIFS_IDLE,
   GIFS_FETCH,
@@ -12,6 +12,7 @@ import {
 const initialState: State = {
   query: '',
   state: FetchingState.Idle,
+  showState: ShowState.Hide,
   fetchError: null,
   data: {},
   source: null,
@@ -26,6 +27,7 @@ export default produce((draft, { type, payload }) => {
   switch (type) {
     case GIFS_IDLE:
       draft.state = FetchingState.Idle
+      draft.showState = ShowState.Hide
       draft.fetchError = null
       draft.query = null
       draft.pagination = {
@@ -36,11 +38,12 @@ export default produce((draft, { type, payload }) => {
       break
     case GIFS_FETCH:
       draft.state = FetchingState.Fetching
+      draft.showState = ShowState[payload.offset === 0 ? 'Hide' : 'Show']
       draft.source = payload.source
       draft.fetchError = null
       // Empty data if user is has made a different search
       // We don't need to empty data if we are fetching same query with offset
-      if (payload.query !== draft.query) draft.data = {}
+      if (payload.offset === 0) draft.data = {}
       draft.pagination.offset = payload.offset
       draft.query = payload.query
       break
@@ -51,15 +54,14 @@ export default produce((draft, { type, payload }) => {
       if (payload.query !== draft.query) return
 
       draft.state = FetchingState.Fetched
-      draft.data[payload.pagination.offset] = {
-        gifs: payload.data,
-        lastUpdated: Date.now(),
-      }
+      draft.showState = ShowState.Show
+      draft.data[payload.pagination.offset] = payload.data
       draft.source = null
       draft.pagination = payload.pagination
       break
     case GIFS_FETCH_REJECTED:
       draft.state = FetchingState.Error
+      draft.showState = ShowState.Hide
       draft.data = {}
       draft.fetchError = payload.data
       // Pagination object should be the same to let to

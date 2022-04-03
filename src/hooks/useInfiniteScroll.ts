@@ -38,15 +38,16 @@ const useInfiniteScroll = ({
   const shouldLoadMore = !disabled && !loading && isVisible && hasNext
 
   useEffect(() => {
+    console.log('oops', loading, shouldLoadMore)
     if (shouldLoadMore) {
       // In some edge cases `loading` prop changes to false with ref item
       // still in view. This will cause repetitive onLoadMore() call
       // We can wait a little to eliminate this possibility.
-      const timer = setTimeout(() => {
+      const id = setTimeout(() => {
         onLoadMore()
       }, delayMs)
       return () => {
-        clearTimeout(timer)
+        clearTimeout(id)
       }
     }
   }, [onLoadMore, shouldLoadMore, delayMs])

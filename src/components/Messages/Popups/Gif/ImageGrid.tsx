@@ -3,7 +3,6 @@ import styled from '@emotion/styled/macro'
 import useSelector from 'src/hooks/useSelector'
 import { FetchingState, ShowState } from 'src/types'
 import Skeleton from 'src/components/blocks/Skeleton'
-import isVerticalImage from 'src/utils/isVerticalImage'
 import { useDispatch } from 'react-redux'
 import { searchGIFs } from 'src/store/actions/gifs'
 import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
@@ -27,11 +26,9 @@ type ItemKeyDownHandler = (
 ) => void
 
 const Grid = styled('div')({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(4, 1fr)',
-  gridAutoRows: ITEM_HEIGHT,
-  gridGap: 8,
-  gridAutoFlow: 'dense',
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 8,
   padding: '12px 6px',
 })
 
@@ -41,10 +38,13 @@ const Item = styled('picture')({
   alignItems: 'center',
   justifyContent: 'center',
   height: ITEM_HEIGHT,
+  flex: '1 0 auto',
+  maxWidth: '100%',
   backgroundColor: 'transparent',
   position: 'relative',
   borderRadius: 2,
   overflow: 'hidden',
+  WebkitTapHighlightColor: 'rgba(0, 0, 0, 0.12)',
   '@supports (content-visibility: auto)': {
     contentVisibility: 'auto',
     containIntrinsicSize: ITEM_HEIGHT,
@@ -56,15 +56,6 @@ const Item = styled('picture')({
     height: '100%',
     boxShadow: '0 0 0 1px rgba(0, 0, 0, .03) inset',
   },
-  '&.vertical': {
-    gridColumnEnd: 'span 1',
-    '@media (max-width: 350px)': {
-      gridColumnEnd: 'span 2',
-    },
-  },
-  '&.horizontal': {
-    gridColumnEnd: 'span 2',
-  },
   '&.no-border::after': {
     content: 'none',
   },
@@ -75,29 +66,33 @@ const Item = styled('picture')({
     position: 'absolute',
     top: 0,
     left: 0,
+    right: 0,
+    bottom: 0,
   },
 })
 
 const StyledSkeleton = styled(Skeleton)({
   borderRadius: 2,
+  flex: '1 0 auto',
   height: ITEM_HEIGHT,
   '&.vertical': {
-    gridColumnEnd: 'span 1',
+    width: 64,
   },
   '&.horizontal': {
-    gridColumnEnd: 'span 2',
+    width: 128,
   },
 })
 
-const Skeletons = () => (
+// eslint-disable-next-line react/display-name
+const Skeletons = React.forwardRef<HTMLDivElement>((_, ref) => (
   <>
+    <StyledSkeleton ref={ref} className="horizontal" />
     <StyledSkeleton className="horizontal" />
+    <StyledSkeleton className="vertical" />
     <StyledSkeleton className="horizontal" />
-    <StyledSkeleton />
-    <StyledSkeleton className="horizontal" />
-    <StyledSkeleton />
+    <StyledSkeleton className="vertical" />
   </>
-)
+))
 
 const ImageGrid: React.FC<ImageGridProps> = ({
   query: propsQuery,
@@ -140,16 +135,6 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     Object.keys(data).forEach((e) => (res = res.concat(data[e])))
     return res
   }, [showState, Object.keys(data)])
-  // Finds how many skeleton items we need to insert at the end
-  // of the image grid
-  const skeletonsLastLineCount = useMemo(() => {
-    let c = 0
-    if (!flatData) return 0
-    flatData.forEach((e) => {
-      c += isVerticalImage(e.images.fixed_height_small) ? 1 : 2
-    })
-    return Math.ceil(c / 4) * 4 - c
-  }, [flatData])
   /** Sends image as attachment */
   const handleItemClick = (e: GifResult['data']) => {
     const originalImage = e.images.original
@@ -178,20 +163,20 @@ const ImageGrid: React.FC<ImageGridProps> = ({
   }
 
   return (
-    <Grid>
+    <Grid role="grid">
       {showState === ShowState.Hide && <Skeletons />}
       {showState === ShowState.Show &&
         flatData.map((e, i) => (
           <Item
+            role="gridcell"
             tabIndex={0}
             key={i}
+            id={e.id.toString()}
             onKeyDown={(event) => handleItemKeyDown(event, e)}
             onClick={() => handleItemClick(e)}
-            className={
-              isVerticalImage(e.images.fixed_height_small)
-                ? 'vertical'
-                : 'horizontal'
-            }
+            style={{
+              width: e.images.fixed_height_small.width + 'px',
+            }}
           >
             <source
               type="image/webp"
@@ -201,14 +186,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
           </Item>
         ))}
       {showState === ShowState.Show && totalCount !== 0 && hasNext && (
-        <>
-          {new Array(skeletonsLastLineCount).fill(0).map((_, i) => (
-            <StyledSkeleton key={i} />
-          ))}
-          <StyledSkeleton ref={scrollEndRef} />
-          <StyledSkeleton className="horizontal" />
-          <StyledSkeleton />
-        </>
+        <Skeletons ref={scrollEndRef} />
       )}
     </Grid>
   )

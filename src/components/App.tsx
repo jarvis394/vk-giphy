@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from '@emotion/styled/macro'
-import TextAreaContainer from 'src/components/blocks/TextAreaContainer'
 import { APP_MAX_WIDTH } from 'src/config/constants'
 import Messages from './Messages'
 
@@ -28,9 +27,7 @@ const App = () => {
       <Messages>
         <Messages.Stack />
         <Messages.Popups />
-        <TextAreaContainer>
-          <Messages.TextArea />
-        </TextAreaContainer>
+        <Messages.TextArea />
       </Messages>
     </Root>
   )

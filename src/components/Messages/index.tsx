@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Stack from './Stack'
 import TextArea from './TextArea'
+import TextAreaInput from './TextAreaInput'
 import Popups from './Popups'
 
 export interface MessagesState {
@@ -32,6 +33,7 @@ const Messages = ({ children }) => {
 }
 
 Messages.TextArea = TextArea
+Messages.TextAreaInput = TextAreaInput
 Messages.Popups = Popups
 Messages.Stack = Stack
 export default Messages

@@ -26,7 +26,7 @@ const App = () => {
   return (
     <Root>
       <Messages>
-        <Messages.Stack></Messages.Stack>
+        <Messages.Stack />
         <Messages.Popups />
         <TextAreaContainer>
           <Messages.TextArea />

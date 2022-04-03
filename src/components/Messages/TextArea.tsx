@@ -1,6 +1,8 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import TextArea, { TextAreaState } from 'src/components/blocks/TextArea'
 import useMessagesContext from 'src/hooks/useMessagesContext'
+import { pushMessage } from 'src/store/actions/messages'
 
 /**
  * Renders textarea component with commands' keyword highlighing feature
@@ -17,18 +19,27 @@ import useMessagesContext from 'src/hooks/useMessagesContext'
  */
 const MessagesTextArea = () => {
   const [messagesContext, setMessagesContext] = useMessagesContext()
-  const handleChange = (
-    _e: React.ChangeEvent<HTMLTextAreaElement>,
-    state: TextAreaState
-  ) => {
-    setMessagesContext(state)
-  }
+  const dispatch = useDispatch()
   const handleSubmit = (state: TextAreaState) => {
-    //dispatch(send(state))
-    console.log('submit:', state)
+    dispatch(
+      pushMessage({
+        text: state.message.trim(),
+        timestamp: Date.now(),
+      })
+    )
+    setMessagesContext({
+      command: null,
+      message: '',
+    })
   }
 
-  return <TextArea onChange={handleChange} onSubmit={handleSubmit} />
+  return (
+    <TextArea
+      onSubmit={handleSubmit}
+      messagesContext={messagesContext}
+      setMessagesContext={setMessagesContext}
+    />
+  )
 }
 
 export default MessagesTextArea

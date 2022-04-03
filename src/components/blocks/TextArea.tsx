@@ -1,12 +1,15 @@
 import styled from '@emotion/styled/macro'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   COMMAND_KEYWORDS,
   COMMAND_PREFIX,
   TEXTAREA_MAX_LINES,
 } from 'src/config/constants'
 import { formatNewLine } from 'src/utils/formatNewLine'
+import { MessagesState } from '../Messages'
 
+type TextAreaChangeHandler = React.ChangeEventHandler<HTMLTextAreaElement>
+type TextAreaKeyDownHandler = React.KeyboardEventHandler<HTMLTextAreaElement>
 export interface TextAreaState {
   message: string
   command: string
@@ -20,6 +23,8 @@ type TextAreaProps = Omit<
     state: TextAreaState
   ) => void
   onSubmit?: (state: TextAreaState) => unknown
+  setMessagesContext?: React.Dispatch<React.SetStateAction<MessagesState>>
+  messagesContext?: MessagesState
 }
 
 const PADDING_VERTICAL = 9.5
@@ -110,86 +115,124 @@ const StyledKeyword = styled('span')({
   WebkitTextFillColor: 'transparent',
 })
 
+const getMessageCommand = (message: string) => {
+  const firstWhitespaceIndex = message?.indexOf(' ')
+  const possibleCommand = message?.slice(1, firstWhitespaceIndex)
+  const commandStartsWithPrefix = message && message[0] === COMMAND_PREFIX
+  const commandInCommandKeywords = COMMAND_KEYWORDS.has(possibleCommand)
+
+  // Highlight word if it has whitespace after it,
+  // starts with `PREFIX` and is in list of supported command keywords
+  if (
+    firstWhitespaceIndex !== -1 &&
+    commandStartsWithPrefix &&
+    commandInCommandKeywords
+  ) {
+    return possibleCommand
+  } else return null
+}
+
+const makeMessageElement = (message: string, command?: string) => {
+  const firstWhitespaceIndex = message?.indexOf(' ')
+  let messageElement = <>{formatNewLine(message)}</>
+
+  // Highlight command if present
+  if (command) {
+    messageElement = (
+      <>
+        <StyledKeyword>{message.slice(0, firstWhitespaceIndex)}</StyledKeyword>
+        {formatNewLine(message.slice(firstWhitespaceIndex))}
+      </>
+    )
+  }
+
+  return messageElement
+}
+
 /**
  * Renders textarea component with commands' keyword highlighing feature
  */
 const TextArea: React.FC<TextAreaProps> = ({
   onChange,
   onSubmit,
+  messagesContext: propsMessagesContext,
+  setMessagesContext: propsSetMessagesContext,
   ...props
 }) => {
-  const [message, setMessage] = useState<string>()
-  const [messageCommand, setMessageCommand] = useState<string>()
+  const textAreaRef = useRef<HTMLTextAreaElement>()
+  const [componentMessagesContext, setComponentMessagesContext] =
+    useState<MessagesState>({
+      message: '',
+      command: null,
+    })
+  const messagesContext = useMemo(
+    () => propsMessagesContext || componentMessagesContext,
+    [propsMessagesContext, componentMessagesContext]
+  )
+  const setMessagesContext = useMemo(
+    () => propsSetMessagesContext || setComponentMessagesContext,
+    [propsSetMessagesContext, setComponentMessagesContext]
+  )
   const [messageElement, setMessageElement] = useState<JSX.Element>()
   const placeholderClasses = useMemo(
     () =>
-      !message || message?.length === 0
+      !messagesContext.message || messagesContext.message?.length === 0
         ? PLACEHOLDER_CLASSES.visible
         : PLACEHOLDER_CLASSES.hidden,
-    [message]
+    [messagesContext.message]
   )
 
-  const handleTextAreaChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
-    e
-  ) => {
-    // No need of sanitizing because text is being inserted safely into page
-    const newMessage = e.target.value
-    const firstWhitespaceIndex = newMessage?.indexOf(' ')
-    const possibleCommand = newMessage?.slice(1, firstWhitespaceIndex)
-    const commandStartsWithPrefix =
-      newMessage && newMessage[0] === COMMAND_PREFIX
-    const commandInCommandKeywords = COMMAND_KEYWORDS.has(possibleCommand)
-    let newMessageElement = <>{formatNewLine(newMessage)}</>
-    let newMessageCommand = null
+  const handleTextAreaChange: TextAreaChangeHandler = useCallback(
+    (e) => {
+      // No need of sanitizing because text is being inserted safely into page
+      const newMessage = e.target.value
+      const newMessageCommand = getMessageCommand(newMessage)
 
-    // Highlight word if it has whitespace after it,
-    // starts with `PREFIX` and is in list of supported command keywords
-    if (
-      firstWhitespaceIndex !== -1 &&
-      commandStartsWithPrefix &&
-      commandInCommandKeywords
-    ) {
-      newMessageElement = (
-        <>
-          <StyledKeyword>
-            {newMessage.slice(0, firstWhitespaceIndex)}
-          </StyledKeyword>
-          {formatNewLine(newMessage.slice(firstWhitespaceIndex))}
-        </>
-      )
-      newMessageCommand = possibleCommand
-    }
-
-    setMessageElement(newMessageElement)
-    setMessage(newMessage)
-    setMessageCommand(newMessageCommand)
-    if (onChange) {
-      onChange(e, {
-        message: newMessage,
+      setMessagesContext({
         command: newMessageCommand,
+        message: newMessage,
       })
-    }
-  }
+      if (onChange) {
+        onChange(e, {
+          message: newMessage,
+          command: newMessageCommand,
+        })
+      }
+    },
+    [setMessagesContext]
+  )
 
-  const handleTextAreaKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> =
-    useCallback(
-      (e) => {
-        const keyCode = e.key
-        if (onSubmit && keyCode === 'Enter' && !e.shiftKey) {
-          e.preventDefault()
-          onSubmit({
-            message,
-            command: messageCommand,
-          })
-        }
-      },
-      [message, onSubmit]
+  const handleTextAreaKeyDown: TextAreaKeyDownHandler = useCallback(
+    (e) => {
+      if (onSubmit && e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        onSubmit(messagesContext)
+        e.currentTarget.focus()
+      }
+    },
+    [messagesContext.message, onSubmit, onChange]
+  )
+
+  /**
+   * Constructs message element for textArea overlay
+   * and refocuses textArea on input
+   */
+  useEffect(() => {
+    const newMessageElement = makeMessageElement(
+      messagesContext.message,
+      messagesContext.command
     )
+    setMessageElement(newMessageElement)
+    if (textAreaRef.current && document.activeElement !== textAreaRef.current) {
+      textAreaRef.current.focus()
+    }
+  }, [messagesContext.message, textAreaRef.current])
 
   return (
     <Root>
       <Wrapper>
         <InnerTextArea
+          ref={textAreaRef}
           role="textbox"
           autoFocus
           aria-multiline="true"
@@ -197,6 +240,7 @@ const TextArea: React.FC<TextAreaProps> = ({
           aria-label="Ввод сообщения"
           onChange={handleTextAreaChange}
           onKeyDown={handleTextAreaKeyDown}
+          value={messagesContext.message}
           {...props}
         />
         <Message>

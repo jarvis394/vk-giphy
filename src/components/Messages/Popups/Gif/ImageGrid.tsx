@@ -10,6 +10,8 @@ import { GIPHY_FETCH_GIFS_COUNT } from 'src/config/constants'
 import useInfiniteScroll from 'src/hooks/useInfiniteScroll'
 import useMessagesContext from 'src/hooks/useMessagesContext'
 import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
+import { GifResult, GifsResult } from '@giphy/js-fetch-api'
+import { pushMessage } from 'src/store/actions/messages'
 
 const ITEM_HEIGHT = 118
 
@@ -87,7 +89,7 @@ const Skeletons = () => (
 )
 
 const ImageGrid = () => {
-  const [messagesContext] = useMessagesContext()
+  const [messagesContext, setMessagesContext] = useMessagesContext()
   const query = useMemo(
     () => getArgsFromMessagesContext(messagesContext) || '',
     [messagesContext.message]
@@ -114,7 +116,7 @@ const ImageGrid = () => {
     hasNext,
     onLoadMore: handleLoadMoreGIFs,
   })
-  const flatData = useMemo(() => {
+  const flatData = useMemo<GifsResult['data']>(() => {
     let res = []
     if (showState === ShowState.Hide) return null
     Object.keys(data).forEach((e) => (res = res.concat(data[e])))
@@ -130,6 +132,26 @@ const ImageGrid = () => {
     })
     return Math.ceil(c / 4) * 4 - c
   }, [flatData])
+  /** Sends image as attachment */
+  const handleItemClick = (e: GifResult['data']) => {
+    const originalImage = e.images.original
+    dispatch(
+      pushMessage({
+        attachment: {
+          width: Number(originalImage.width),
+          height: Number(originalImage.height),
+          url: originalImage.url,
+          webp: originalImage.webp,
+          title: e.title,
+        },
+        timestamp: Date.now(),
+      })
+    )
+    setMessagesContext({
+      command: null,
+      message: '',
+    })
+  }
 
   return (
     <Grid>
@@ -138,6 +160,7 @@ const ImageGrid = () => {
         flatData.map((e, i) => (
           <Item
             key={i}
+            onClick={() => handleItemClick(e)}
             className={
               isVerticalImage(e.images.fixed_height_small)
                 ? 'vertical'
@@ -148,7 +171,7 @@ const ImageGrid = () => {
               type="image/webp"
               srcSet={e.images.fixed_height_small.webp}
             />
-            <img src={e.images.fixed_height_small.url} alt="" />
+            <img src={e.images.fixed_height_small.url} alt={e.title} />
           </Item>
         ))}
       {showState === ShowState.Show && totalCount !== 0 && hasNext && (

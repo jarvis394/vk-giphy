@@ -7,6 +7,7 @@ const Root = styled('div')({
   borderTop: '1px solid #DCE1E5',
   padding: '13px 16px',
   height: 'fit-content',
+  zIndex: 10,
 })
 
 const TextAreaContainer = ({ children }) => {

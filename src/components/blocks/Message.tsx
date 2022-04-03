@@ -75,6 +75,14 @@ const Message: React.FC<{
       ),
     []
   )
+  const timestamp = useMemo(
+    () =>
+      new Date(data.timestamp).toLocaleTimeString([], {
+        timeStyle: 'short',
+      }),
+    [data.timestamp]
+  )
+
   return (
     <Root>
       {data.attachment && (
@@ -88,11 +96,7 @@ const Message: React.FC<{
         </Attachment>
       )}
       {data.text && <Text>{data.text}</Text>}
-      <Timestamp>
-        {new Date(data.timestamp).toLocaleTimeString([], {
-          timeStyle: 'short',
-        })}
-      </Timestamp>
+      <Timestamp>{timestamp}</Timestamp>
     </Root>
   )
 }

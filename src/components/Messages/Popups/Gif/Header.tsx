@@ -2,9 +2,15 @@ import React, { useMemo } from 'react'
 import styled from '@emotion/styled/macro'
 import useSelector from 'src/hooks/useSelector'
 import useMessagesContext from 'src/hooks/useMessagesContext'
-import { FetchingState, ShowState } from 'src/types'
+import { ShowState } from 'src/types'
 import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
 import Spinner from 'src/components/blocks/Spinner'
+import { State as GifsStoreState } from 'src/store/reducers/gifs/types'
+
+interface HeaderProps {
+  query?: GifsStoreState['query']
+  showState?: GifsStoreState['showState']
+}
 
 const Root = styled('div')({
   display: 'flex',
@@ -28,13 +34,20 @@ const StyledSpinner = styled(Spinner)({
   color: '#B0B5BA',
 })
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = ({
+  query: propsQuery,
+  showState: propsShowState,
+}) => {
   const [messagesContext] = useMessagesContext()
   const query = useMemo(
-    () => getArgsFromMessagesContext(messagesContext) || '',
-    [messagesContext.message]
+    () => propsQuery || getArgsFromMessagesContext(messagesContext) || '',
+    [propsQuery, messagesContext.message]
   )
-  const showState = useSelector((store) => store.gifs.showState)
+  const storeShowState = useSelector((store) => store.gifs.showState)
+  const showState = useMemo(
+    () => propsShowState || storeShowState,
+    [propsShowState, storeShowState]
+  )
 
   if (!query) return null
 
@@ -53,4 +66,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default React.memo(Header)

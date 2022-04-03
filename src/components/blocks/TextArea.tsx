@@ -151,6 +151,30 @@ const makeMessageElement = (message: string, command?: string) => {
 
 /**
  * Renders textarea component with commands' keyword highlighing feature
+ * Can be controlled or uncontrolled. Provide `messagesContext` and `setMessagesContext`
+ * to use controlled-style.
+ *
+ * @component
+ * @example
+ * // Controlled variant
+ * const [messagesContext, setMessagesContext] = useMessagesContext()
+ *
+ * return (
+ *   <TextArea
+ *     messagesContext={messagesContext}
+ *     setMessagesContext={setMessagesContext}
+ *   />
+ * )
+ *
+ * // Uncontrolled variant
+ * const [messagesContext, setMessagesContext] = useMessagesContext()
+ * const handleChange = (_e, newMessagesContext) => {
+ *   setMessagesContext(newMessagesContext)
+ * }
+ *
+ * return (
+ *   <TextArea onChange={handleChange} onSubmit={...} />
+ * )
  */
 const TextArea: React.FC<TextAreaProps> = ({
   onChange,
@@ -204,7 +228,12 @@ const TextArea: React.FC<TextAreaProps> = ({
 
   const handleTextAreaKeyDown: TextAreaKeyDownHandler = useCallback(
     (e) => {
-      if (onSubmit && e.key === 'Enter' && !e.shiftKey) {
+      if (
+        onSubmit &&
+        e.key === 'Enter' &&
+        !e.shiftKey &&
+        messagesContext.message.trim() !== ''
+      ) {
         e.preventDefault()
         onSubmit(messagesContext)
         e.currentTarget.focus()

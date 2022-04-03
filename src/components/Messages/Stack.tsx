@@ -17,6 +17,7 @@ const Stack = () => {
   const messages = useSelector((store) => store.messages.data)
   const rootRef = useRef<HTMLDivElement>()
 
+  /** Scroll to bottom on message push */
   useEffect(() => {
     rootRef.current && rootRef.current.scrollTo(0, rootRef.current.scrollHeight)
   }, [messages])

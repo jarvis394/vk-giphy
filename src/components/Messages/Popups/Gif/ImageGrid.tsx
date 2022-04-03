@@ -12,8 +12,19 @@ import useMessagesContext from 'src/hooks/useMessagesContext'
 import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
 import { GifResult, GifsResult } from '@giphy/js-fetch-api'
 import { pushMessage } from 'src/store/actions/messages'
+import { State as GifsStoreState } from 'src/store/reducers/gifs/types'
 
 const ITEM_HEIGHT = 118
+
+interface ImageGridProps {
+  query?: GifsStoreState['query']
+  showState?: GifsStoreState['showState']
+}
+
+type ItemKeyDownHandler = (
+  event: React.KeyboardEvent<HTMLElement>,
+  item: GifResult['data']
+) => void
 
 const Grid = styled('div')({
   display: 'grid',
@@ -88,16 +99,23 @@ const Skeletons = () => (
   </>
 )
 
-const ImageGrid = () => {
+const ImageGrid: React.FC<ImageGridProps> = ({
+  query: propsQuery,
+  showState: propsShowState,
+}) => {
   const [messagesContext, setMessagesContext] = useMessagesContext()
   const query = useMemo(
-    () => getArgsFromMessagesContext(messagesContext) || '',
-    [messagesContext.message]
+    () => propsQuery || getArgsFromMessagesContext(messagesContext) || '',
+    [propsQuery, messagesContext.message]
   )
   const totalCount = useSelector((store) => store.gifs.pagination.total_count)
   const data = useSelector((store) => store.gifs.data)
   const state = useSelector((store) => store.gifs.state)
-  const showState = useSelector((store) => store.gifs.showState)
+  const storeShowState = useSelector((store) => store.gifs.showState)
+  const showState = useMemo(
+    () => propsShowState || storeShowState,
+    [propsShowState, storeShowState]
+  )
   const [currentOffset, setCurrentOffset] = useState(0)
   const hasNext = currentOffset + GIPHY_FETCH_GIFS_COUNT < totalCount
   const dispatch = useDispatch()
@@ -152,6 +170,12 @@ const ImageGrid = () => {
       message: '',
     })
   }
+  const handleItemKeyDown: ItemKeyDownHandler = (event, item) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      handleItemClick(item)
+    }
+  }
 
   return (
     <Grid>
@@ -159,7 +183,9 @@ const ImageGrid = () => {
       {showState === ShowState.Show &&
         flatData.map((e, i) => (
           <Item
+            tabIndex={0}
             key={i}
+            onKeyDown={(event) => handleItemKeyDown(event, e)}
             onClick={() => handleItemClick(e)}
             className={
               isVerticalImage(e.images.fixed_height_small)

@@ -8,7 +8,11 @@
 import { clientsClaim, setCacheNameDetails } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
-import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching'
+import {
+  precacheAndRoute,
+  createHandlerBoundToURL,
+  precache,
+} from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
 import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies'
 
@@ -20,6 +24,14 @@ clientsClaim()
 // Their URLs are injected into the manifest variable below.
 // This variable must be present somewhere in the service worker file.
 precacheAndRoute(self.__WB_MANIFEST)
+
+// Precache images
+precache([
+  './emojis-sprite.png',
+  './error-emoji.png',
+  './sad-emoji.png',
+  './search-emoji.png',
+])
 
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with the index.html shell.
@@ -112,7 +124,7 @@ registerRoute(
       }),
       new ExpirationPlugin({
         maxAgeSeconds: 24 * 60 * 60 * 7, // one week
-        maxEntries: 100,
+        maxEntries: 20,
       }),
     ],
   })

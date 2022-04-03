@@ -129,17 +129,6 @@ const EmojiTextBox = styled('span')({
 })
 
 const EnterQuery = () => {
-  // const [messagesContext] = useMessagesContext()
-  // const query = useMemo(
-  //   () => getArgsFromMessagesContext(messagesContext) || '',
-  //   [messagesContext.message]
-  // )
-
-  // // Do not show this screen if user entered the query
-  // if (query) return null
-
-  console.log('upd')
-
   return (
     <Centered>
       <Emoji />

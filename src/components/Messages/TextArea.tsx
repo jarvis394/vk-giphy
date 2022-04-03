@@ -72,10 +72,12 @@ const MessagesTextArea = () => {
     () => messagesContext.message.trim().length !== 0,
     [messagesContext.message]
   )
-  const handleCancelClick = () => {
+  const handleCancelClick = (e) => {
+    e.preventDefault()
     setMessagesContext((prev) => escapeCommand(prev))
   }
-  const handleSendClick = useCallback(() => {
+  const handleSendClick = useCallback((e) => {
+    e.preventDefault()
     if (canSendMessage) {
       dispatch(
         pushMessage({

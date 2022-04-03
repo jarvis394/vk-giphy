@@ -16,6 +16,8 @@ import {
 import { registerRoute } from 'workbox-routing'
 import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies'
 
+const generateRevision = () => Date.now().toString()
+
 declare const self: ServiceWorkerGlobalScope
 
 clientsClaim()
@@ -27,10 +29,10 @@ precacheAndRoute(self.__WB_MANIFEST)
 
 // Precache images
 precache([
-  './emojis-sprite.png',
-  './error-emoji.png',
-  './sad-emoji.png',
-  './search-emoji.png',
+  { url: './emojis-sprite.png', revision: generateRevision() },
+  { url: './error-emoji.png', revision: generateRevision() },
+  { url: './sad-emoji.png', revision: generateRevision() },
+  { url: './search-emoji.png', revision: generateRevision() },
 ])
 
 // Set up App Shell-style routing, so that all navigation requests

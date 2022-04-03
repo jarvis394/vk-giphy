@@ -179,6 +179,7 @@ const makeMessageElement = (message: string, command?: string) => {
 const TextArea: React.FC<TextAreaProps> = ({
   onChange,
   onSubmit,
+  onKeyDown,
   messagesContext: propsMessagesContext,
   setMessagesContext: propsSetMessagesContext,
   ...props
@@ -238,8 +239,9 @@ const TextArea: React.FC<TextAreaProps> = ({
         onSubmit(messagesContext)
         e.currentTarget.focus()
       }
+      onKeyDown(e)
     },
-    [messagesContext.message, onSubmit, onChange]
+    [messagesContext.message, onSubmit, onKeyDown]
   )
 
   /**

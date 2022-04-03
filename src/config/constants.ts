@@ -3,7 +3,7 @@ export const GIPHY_API_URL = 'https://api.giphy.com/v1/gifs/'
 export const COMMAND_PREFIX = '/'
 
 /** Holds all supported keywords for commands */
-export const COMMAND_KEYWORDS = new Set(['gif'])
+export const COMMAND_KEYWORDS = new Set(['gif', 'test'])
 
 export const APP_MAX_WIDTH = 500
 export const MESSAGE_ATTACHMENT_VERTICAL_MAX_WIDTH = 256

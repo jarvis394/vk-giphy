@@ -24,6 +24,7 @@ interface GetCurrentScreenProps {
   state: GifsStoreState['state']
   totalCount: GifsStoreState['pagination']['total_count']
   showState: GifsStoreState['showState']
+  command: string
 }
 
 const Root = styled('div')<{ isLoading: boolean }>(({ isLoading }) => ({
@@ -56,11 +57,12 @@ const getCurrentScreen = ({
   state,
   totalCount,
   showState,
+  command,
 }: GetCurrentScreenProps) => {
   return (
     <>
       {query && <Header query={query} showState={showState} />}
-      {!query && <EnterQueryScreen />}
+      {!query && command === 'gif' && <EnterQueryScreen />}
       {query && state === FetchingState.Fetched && totalCount === 0 && (
         <NoResultsScreen />
       )}
@@ -86,40 +88,64 @@ const GifPopup = () => {
   const totalCount = useSelector((store) => store.gifs.pagination.total_count)
   const showState = useSelector((store) => store.gifs.showState)
   const [currentScreen, setCurrentScreen] = useState(
-    getCurrentScreen({ query, state, totalCount, showState })
+    getCurrentScreen({
+      query,
+      state,
+      totalCount,
+      showState,
+      command: messagesContext.command,
+    })
   )
   const [currentShowState, setCurrentShowState] = useState(showState)
+  const [isShown, setIsShown] = useState(messagesContext.command === 'gif')
 
   useEffect(() => {
     rootRef.current?.scrollTo(0, 0)
     dispatch(flushGIFs())
-    const id = setTimeout(() => {
-      if (storeQuery !== query && query !== '') {
-        dispatch(
-          searchGIFs({
-            query,
-          })
-        )
-      }
-    }, SEARCH_DELAY_MS)
-    return () => clearTimeout(id)
-  }, [query])
+    if (messagesContext.command === 'gif') {
+      const id = setTimeout(() => {
+        if (storeQuery !== query && query !== '') {
+          dispatch(
+            searchGIFs({
+              query,
+            })
+          )
+        }
+      }, SEARCH_DELAY_MS)
+      return () => clearTimeout(id)
+    }
+  }, [messagesContext.message])
 
   /** Preserve component state to create seamless inactive transition */
   useEffect(() => {
     if (messagesContext.command === 'gif') {
+      setIsShown(true)
       setCurrentShowState(showState)
       setCurrentScreen(
-        getCurrentScreen({ query, state, totalCount, showState })
+        getCurrentScreen({
+          query,
+          state,
+          totalCount,
+          showState,
+          command: messagesContext.command,
+        })
       )
+    } else {
+      // We want to reset EnterQuery screen every time popup has been closed
+      const id = setTimeout(() => {
+        isShown && setIsShown(false)
+      }, 180) // Transition duration of popup close
+      return () => clearTimeout(id)
     }
   }, [messagesContext.command, query, state, totalCount, showState])
 
   return (
     <Popup active={messagesContext.command === 'gif'}>
-      <Root isLoading={currentShowState === ShowState.Hide} ref={rootRef}>
-        {currentScreen}
-      </Root>
+      {isShown && (
+        <Root isLoading={currentShowState === ShowState.Hide} ref={rootRef}>
+          {currentScreen}
+        </Root>
+      )}
     </Popup>
   )
 }

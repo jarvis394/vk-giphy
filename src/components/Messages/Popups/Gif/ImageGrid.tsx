@@ -11,10 +11,12 @@ import useInfiniteScroll from 'src/hooks/useInfiniteScroll'
 import useMessagesContext from 'src/hooks/useMessagesContext'
 import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
 
+const ITEM_HEIGHT = 118
+
 const Grid = styled('div')({
   display: 'grid',
   gridTemplateColumns: 'repeat(4, 1fr)',
-  gridAutoRows: 118,
+  gridAutoRows: ITEM_HEIGHT,
   gridGap: 8,
   gridAutoFlow: 'dense',
   padding: '12px 6px',
@@ -25,11 +27,15 @@ const Item = styled('picture')({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 118,
+  height: ITEM_HEIGHT,
   backgroundColor: 'transparent',
   position: 'relative',
   borderRadius: 2,
   overflow: 'hidden',
+  '@supports (content-visibility: auto)': {
+    contentVisibility: 'auto',
+    containIntrinsicSize: ITEM_HEIGHT,
+  },
   '&::after': {
     content: '""',
     position: 'absolute',
@@ -61,7 +67,7 @@ const Item = styled('picture')({
 
 const StyledSkeleton = styled(Skeleton)({
   borderRadius: 2,
-  height: 118,
+  height: ITEM_HEIGHT,
   '&.vertical': {
     gridColumnEnd: 'span 1',
   },

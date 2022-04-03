@@ -199,6 +199,9 @@ const TextArea: React.FC<TextAreaProps> = ({
     [propsSetMessagesContext, setComponentMessagesContext]
   )
   const [messageElement, setMessageElement] = useState<JSX.Element>()
+  const [lastSelectionRange, setLastSelectionRange] = useState<
+    [number, number]
+  >([0, 0])
   const placeholderClasses = useMemo(
     () =>
       !messagesContext.message || messagesContext.message?.length === 0
@@ -243,6 +246,14 @@ const TextArea: React.FC<TextAreaProps> = ({
     },
     [messagesContext.message, onSubmit, onKeyDown]
   )
+  const handleTextAreaBlur = useCallback(
+    () =>
+      setLastSelectionRange([
+        textAreaRef.current?.selectionStart || 0,
+        textAreaRef.current?.selectionEnd || 0,
+      ]),
+    [textAreaRef.current]
+  )
 
   /**
    * Constructs message element for textArea overlay
@@ -254,8 +265,13 @@ const TextArea: React.FC<TextAreaProps> = ({
       messagesContext.command
     )
     setMessageElement(newMessageElement)
+    // Refocus and save last selection range
     if (textAreaRef.current && document.activeElement !== textAreaRef.current) {
       textAreaRef.current.focus()
+      textAreaRef.current.setSelectionRange(
+        lastSelectionRange[0],
+        lastSelectionRange[1]
+      )
     }
   }, [messagesContext.message, textAreaRef.current])
 
@@ -271,6 +287,7 @@ const TextArea: React.FC<TextAreaProps> = ({
           aria-label="Ввод сообщения"
           onChange={handleTextAreaChange}
           onKeyDown={handleTextAreaKeyDown}
+          onBlur={handleTextAreaBlur}
           value={messagesContext.message}
           {...props}
         />

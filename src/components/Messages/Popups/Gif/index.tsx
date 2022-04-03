@@ -59,20 +59,25 @@ const getCurrentScreen = ({
   showState,
   command,
 }: GetCurrentScreenProps) => {
-  return (
-    <>
-      {query && <Header query={query} showState={showState} />}
-      {!query && command === 'gif' && <EnterQueryScreen />}
-      {query && state === FetchingState.Fetched && totalCount === 0 && (
-        <NoResultsScreen />
-      )}
-      {query && query.length > GIPHY_MAX_QUERY_LENGTH && <QueryTooLongScreen />}
-      {query && query.length <= GIPHY_MAX_QUERY_LENGTH && (
+  if (!query && command === 'gif') return <EnterQueryScreen />
+  if (query && query.length > GIPHY_MAX_QUERY_LENGTH)
+    return (
+      <>
+        <Header query={query} showState={ShowState.Show} />
+        <QueryTooLongScreen />
+      </>
+    )
+  else if (query)
+    return (
+      <>
+        <Header query={query} showState={showState} />
+        {state === FetchingState.Fetched && totalCount === 0 && (
+          <NoResultsScreen />
+        )}
         <ImageGridScreen query={query} showState={showState} />
-      )}
-      {state === FetchingState.Error && <ErrorScreen />}
-    </>
-  )
+        {state === FetchingState.Error && <ErrorScreen />}
+      </>
+    )
 }
 
 const GifPopup = () => {
@@ -104,7 +109,11 @@ const GifPopup = () => {
     dispatch(flushGIFs())
     if (messagesContext.command === 'gif') {
       const id = setTimeout(() => {
-        if (storeQuery !== query && query !== '') {
+        if (
+          storeQuery !== query &&
+          query !== '' &&
+          query.length <= GIPHY_MAX_QUERY_LENGTH
+        ) {
           dispatch(
             searchGIFs({
               query,

@@ -5,6 +5,7 @@ import {
   MESSAGE_ATTACHMENT_VERTICAL_MAX_WIDTH,
 } from 'src/config/constants'
 import { Message as MessageType } from 'src/types'
+import { formatNewLine } from 'src/utils/formatNewLine'
 import isVerticalImage from 'src/utils/isVerticalImage'
 
 const Timestamp = styled('span')({
@@ -95,7 +96,7 @@ const Message: React.FC<{
           <img src={data.attachment.url} alt={data.attachment.title} />
         </Attachment>
       )}
-      {data.text && <Text>{data.text}</Text>}
+      {data.text && <Text>{formatNewLine(data.text)}</Text>}
       <Timestamp>{timestamp}</Timestamp>
     </Root>
   )

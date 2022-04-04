@@ -135,9 +135,14 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     Object.keys(data).forEach((e) => (res = res.concat(data[e])))
     return res
   }, [showState, Object.keys(data)])
+
   /** Sends image as attachment */
-  const handleItemClick = (e: GifResult['data']) => {
-    const originalImage = e.images.original
+  const handleItemClick = (
+    event: React.MouseEvent | React.TouchEvent | React.KeyboardEvent,
+    item: GifResult['data']
+  ) => {
+    event.preventDefault()
+    const originalImage = item.images.original
     dispatch(
       pushMessage({
         attachment: {
@@ -145,7 +150,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
           height: Number(originalImage.height),
           url: originalImage.url,
           webp: originalImage.webp,
-          title: e.title,
+          title: item.title,
         },
         timestamp: Date.now(),
       })
@@ -157,8 +162,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
   }
   const handleItemKeyDown: ItemKeyDownHandler = (event, item) => {
     if (event.key === 'Enter') {
-      event.preventDefault()
-      handleItemClick(item)
+      handleItemClick(event, item)
     }
   }
 
@@ -173,7 +177,8 @@ const ImageGrid: React.FC<ImageGridProps> = ({
             key={i}
             id={e.id.toString()}
             onKeyDown={(event) => handleItemKeyDown(event, e)}
-            onClick={() => handleItemClick(e)}
+            onClick={(event) => handleItemClick(event, e)}
+            onTouchEnd={(event) => handleItemClick(event, e)}
             style={{
               width: e.images.fixed_height_small.width + 'px',
             }}

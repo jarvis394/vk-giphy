@@ -7,7 +7,7 @@ import { Icon24Cancel, Icon24Send } from '@vkontakte/icons'
 import { pushMessage } from 'src/store/actions/messages'
 import { useDispatch } from 'react-redux'
 
-const Root = styled('form')({
+const Root = styled('div')({
   width: '100%',
   background: '#FAFBFC',
   borderTop: '1px solid #DCE1E5',
@@ -55,12 +55,12 @@ const Buttons = styled('div')({
 })
 
 const CancelButton = ({ ...props }) => (
-  <IconButton {...props} type="submit">
+  <IconButton {...props}>
     <Icon24Cancel />
   </IconButton>
 )
 const SendButton = ({ ...props }) => (
-  <IconButton {...props} type="submit">
+  <IconButton {...props}>
     <Icon24Send />
   </IconButton>
 )

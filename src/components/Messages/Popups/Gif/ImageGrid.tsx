@@ -12,6 +12,7 @@ import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
 import { GifResult, GifsResult } from '@giphy/js-fetch-api'
 import { pushMessage } from 'src/store/actions/messages'
 import { State as GifsStoreState } from 'src/store/reducers/gifs/types'
+import { useTrackVisibility } from 'react-intersection-observer-hook'
 
 const ITEM_HEIGHT = 118
 const SELECTED_CLASS_NAME = 'messages__image-grid-item--selected'
@@ -25,12 +26,21 @@ interface ImageGridProps {
   showState?: GifsStoreState['showState']
 }
 
+interface ItemProps {
+  data: GifResult['data']
+  handleItemKeyDown: ItemKeyDownHandler
+  handleItemClick: HandleItemClick
+}
+
+type HandleItemClick = (
+  event: React.MouseEvent | React.TouchEvent | React.KeyboardEvent,
+  item: GifResult['data']
+) => void
+
 type ItemKeyDownHandler = (
   event: React.KeyboardEvent<HTMLElement>,
   item: GifResult['data']
 ) => void
-
-type GridKeyUpHandler = React.KeyboardEventHandler<HTMLDivElement>
 
 const Grid = styled('div')({
   display: 'flex',
@@ -39,7 +49,7 @@ const Grid = styled('div')({
   padding: '12px 6px',
 })
 
-const Item = styled('picture')({
+const ItemRoot = styled('picture')({
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
@@ -47,7 +57,7 @@ const Item = styled('picture')({
   height: ITEM_HEIGHT,
   flex: '1 0 auto',
   maxWidth: '100%',
-  backgroundColor: 'transparent',
+  backgroundColor: '#E9ECEF',
   position: 'relative',
   borderRadius: 2,
   overflow: 'hidden',
@@ -85,6 +95,20 @@ const Item = styled('picture')({
   },
 })
 
+const ItemPlaceholder = styled('span')({
+  display: 'flex',
+  height: ITEM_HEIGHT,
+  flex: '1 0 auto',
+  maxWidth: '100%',
+  backgroundColor: '#E9ECEF',
+  position: 'relative',
+  borderRadius: 2,
+  '@supports (content-visibility: auto)': {
+    contentVisibility: 'auto',
+    containIntrinsicSize: ITEM_HEIGHT,
+  },
+})
+
 const StyledSkeleton = styled(Skeleton)({
   borderRadius: 2,
   flex: '1 0 auto',
@@ -107,6 +131,46 @@ const Skeletons = React.forwardRef<HTMLDivElement>((_, ref) => (
     <StyledSkeleton className="vertical" />
   </>
 ))
+
+const ItemUnmemoized: React.FC<ItemProps> = ({
+  data,
+  handleItemKeyDown,
+  handleItemClick,
+}) => {
+  const id = data.id.toString()
+  const image = data.images.fixed_height_small
+  const [ref, { isVisible }] = useTrackVisibility({
+    rootMargin: '200px',
+  })
+
+  return isVisible ? (
+    <ItemRoot
+      role="gridcell"
+      tabIndex={-1}
+      key={id}
+      id={id}
+      ref={ref}
+      onKeyDown={(event) => handleItemKeyDown(event, data)}
+      onClick={(event) => handleItemClick(event, data)}
+      onTouchEnd={(event) => handleItemClick(event, data)}
+      style={{
+        width: image.width + 'px',
+      }}
+    >
+      <source type="image/webp" srcSet={image.webp} />
+      <img src={image.url} alt={data.title} />
+    </ItemRoot>
+  ) : (
+    <ItemPlaceholder
+      id={id}
+      ref={ref}
+      style={{
+        width: image.width + 'px',
+      }}
+    />
+  )
+}
+const Item = React.memo(ItemUnmemoized)
 
 const ImageGrid: React.FC<ImageGridProps> = ({
   query: propsQuery,
@@ -144,7 +208,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
   }, [query, currentOffset])
   const scrollEndRef = useInfiniteScroll({
     loading: state === FetchingState.Fetching,
-    rootMargin: '0px 0px 0px 0px',
+    rootMargin: '100px',
     hasNext,
     onLoadMore: handleLoadMoreGIFs,
   })
@@ -156,10 +220,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
   }, [showState, Object.keys(data)])
 
   /** Sends image as attachment */
-  const handleItemClick = (
-    event: React.MouseEvent | React.TouchEvent | React.KeyboardEvent,
-    item: GifResult['data']
-  ) => {
+  const handleItemClick: HandleItemClick = (event, item) => {
     event.preventDefault()
     const originalImage = item.images.original
     dispatch(
@@ -228,7 +289,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
   }, [gridRef.current, flatData, gridSelection])
 
   useEffect(() => {
-    if (flatData) {
+    if (flatData && flatData.length > 0) {
       const currentId = flatData[gridSelection.current].id.toString()
       const prevId = flatData[gridSelection.prev].id.toString()
       const prev = document.getElementById(prevId)
@@ -250,25 +311,13 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     <Grid role="grid" ref={gridRef} tabIndex={0} onBlur={handleGridBlur}>
       {showState === ShowState.Hide && <Skeletons />}
       {showState === ShowState.Show &&
-        flatData.map((e, i) => (
+        flatData.map((e) => (
           <Item
-            role="gridcell"
-            tabIndex={-1}
-            key={i}
-            id={e.id.toString()}
-            onKeyDown={(event) => handleItemKeyDown(event, e)}
-            onClick={(event) => handleItemClick(event, e)}
-            onTouchEnd={(event) => handleItemClick(event, e)}
-            style={{
-              width: e.images.fixed_height_small.width + 'px',
-            }}
-          >
-            <source
-              type="image/webp"
-              srcSet={e.images.fixed_height_small.webp}
-            />
-            <img src={e.images.fixed_height_small.url} alt={e.title} />
-          </Item>
+            handleItemClick={handleItemClick}
+            handleItemKeyDown={handleItemKeyDown}
+            key={e.id}
+            data={e}
+          />
         ))}
       {showState === ShowState.Show && totalCount !== 0 && hasNext && (
         <Skeletons ref={scrollEndRef} />

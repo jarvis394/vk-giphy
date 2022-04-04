@@ -151,8 +151,7 @@ const ItemUnmemoized: React.FC<ItemProps> = ({
       id={id}
       ref={ref}
       onKeyDown={(event) => handleItemKeyDown(event, data)}
-      onClick={(event) => handleItemClick(event, data)}
-      onTouchEnd={(event) => handleItemClick(event, data)}
+      onMouseDown={(event) => handleItemClick(event, data)}
       style={{
         width: image.width + 'px',
       }}

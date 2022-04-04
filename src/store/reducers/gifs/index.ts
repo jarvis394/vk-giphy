@@ -28,7 +28,6 @@ export default produce((draft, { type, payload }) => {
     case GIFS_IDLE:
       draft.state = FetchingState.Idle
       draft.showState = ShowState.Hide
-      draft.fetchError = null
       draft.query = null
       draft.pagination = {
         count: GIPHY_FETCH_GIFS_COUNT,

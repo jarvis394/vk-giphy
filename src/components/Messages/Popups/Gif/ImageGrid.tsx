@@ -151,7 +151,9 @@ const ItemUnmemoized: React.FC<ItemProps> = ({
       id={id}
       ref={ref}
       onKeyDown={(event) => handleItemKeyDown(event, data)}
-      onMouseDown={(event) => handleItemClick(event, data)}
+      onClick={(event) => handleItemClick(event, data)}
+      // Fixes soft keyboard hide and show on refocus
+      onMouseDown={(event) => event.preventDefault()}
       style={{
         width: image.width + 'px',
       }}

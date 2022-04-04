@@ -101,9 +101,7 @@ const MessagesTextArea = () => {
       <Buttons
         onClick={messagesContext.command ? handleCancelClick : handleSendClick}
         // Fixes soft keyboard hide and show on refocus
-        onTouchEnd={
-          messagesContext.command ? handleCancelClick : handleSendClick
-        }
+        onMouseDown={(event) => event.preventDefault()}
       >
         <CancelButton active={!!messagesContext.command} />
         <SendButton

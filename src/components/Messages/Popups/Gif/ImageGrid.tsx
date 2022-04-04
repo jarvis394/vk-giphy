@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styled from '@emotion/styled/macro'
 import useSelector from 'src/hooks/useSelector'
 import { FetchingState, ShowState } from 'src/types'
@@ -14,6 +14,11 @@ import { pushMessage } from 'src/store/actions/messages'
 import { State as GifsStoreState } from 'src/store/reducers/gifs/types'
 
 const ITEM_HEIGHT = 118
+const SELECTED_CLASS_NAME = 'messages__image-grid-item--selected'
+const NAVIGATION = {
+  Left: 'ArrowLeft',
+  Right: 'ArrowRight',
+}
 
 interface ImageGridProps {
   query?: GifsStoreState['query']
@@ -24,6 +29,8 @@ type ItemKeyDownHandler = (
   event: React.KeyboardEvent<HTMLElement>,
   item: GifResult['data']
 ) => void
+
+type GridKeyUpHandler = React.KeyboardEventHandler<HTMLDivElement>
 
 const Grid = styled('div')({
   display: 'flex',
@@ -68,6 +75,13 @@ const Item = styled('picture')({
     left: 0,
     right: 0,
     bottom: 0,
+    borderRadius: 2,
+  },
+  '&:focus': {
+    outline: 'none',
+  },
+  [`&.${SELECTED_CLASS_NAME}`]: {
+    outline: '2px solid #0077ff',
   },
 })
 
@@ -112,6 +126,11 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     [propsShowState, storeShowState]
   )
   const [currentOffset, setCurrentOffset] = useState(0)
+  const [gridSelection, setGridSelection] = useState({
+    prev: 0,
+    current: 0,
+  })
+  const gridRef = useRef<HTMLDivElement>()
   const hasNext = currentOffset + GIPHY_FETCH_GIFS_COUNT < totalCount
   const dispatch = useDispatch()
   const handleLoadMoreGIFs = useCallback(() => {
@@ -160,20 +179,81 @@ const ImageGrid: React.FC<ImageGridProps> = ({
       message: '',
     })
   }
+
   const handleItemKeyDown: ItemKeyDownHandler = (event, item) => {
     if (event.key === 'Enter') {
       handleItemClick(event, item)
     }
   }
 
+  /** Handles keyboard arrow presses to navigate through grid */
+  const handleGridKeyboardNavigation = useCallback(
+    (e) => {
+      if (!flatData) return null
+      if (e.key === NAVIGATION.Left && gridSelection.current !== 0) {
+        setGridSelection((prev) => ({
+          prev: prev.current,
+          current: prev.current - 1,
+        }))
+      } else if (
+        e.key === NAVIGATION.Right &&
+        gridSelection.current !== flatData.length - 1
+      ) {
+        setGridSelection((prev) => ({
+          prev: prev.current,
+          current: prev.current + 1,
+        }))
+      } else if (e.key === 'Enter') {
+        handleItemClick(e, flatData[gridSelection.current])
+      }
+    },
+    [flatData, gridSelection]
+  )
+
+  /** Removes selection on grid blur */
+  const handleGridBlur = () => {
+    const el = document.getElementsByClassName(SELECTED_CLASS_NAME)[0]
+    el?.classList?.remove(SELECTED_CLASS_NAME)
+  }
+
+  /** Registers grid arrow navigation handler */
+  useEffect(() => {
+    gridRef.current?.addEventListener('keydown', handleGridKeyboardNavigation)
+    return () => {
+      gridRef.current?.removeEventListener(
+        'keydown',
+        handleGridKeyboardNavigation
+      )
+    }
+  }, [gridRef.current, flatData, gridSelection])
+
+  useEffect(() => {
+    if (flatData) {
+      const currentId = flatData[gridSelection.current].id.toString()
+      const prevId = flatData[gridSelection.prev].id.toString()
+      const prev = document.getElementById(prevId)
+      const current = document.getElementById(currentId)
+      current.classList.add(SELECTED_CLASS_NAME)
+      prev.classList.remove(SELECTED_CLASS_NAME)
+
+      // Do not scroll into item view if we first time get focus,
+      // therefore not messing up user's first scroll
+      if (gridSelection.current !== gridSelection.prev) {
+        current.scrollIntoView({
+          block: 'center',
+        })
+      }
+    }
+  }, [flatData, gridSelection])
+
   return (
-    <Grid role="grid">
+    <Grid role="grid" ref={gridRef} tabIndex={0} onBlur={handleGridBlur}>
       {showState === ShowState.Hide && <Skeletons />}
       {showState === ShowState.Show &&
         flatData.map((e, i) => (
           <Item
             role="gridcell"
-            tabIndex={0}
+            tabIndex={-1}
             key={i}
             id={e.id.toString()}
             onKeyDown={(event) => handleItemKeyDown(event, e)}

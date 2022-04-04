@@ -10,6 +10,8 @@ import { MessagesState } from '../Messages'
 
 type TextAreaChangeHandler = React.ChangeEventHandler<HTMLTextAreaElement>
 type TextAreaKeyDownHandler = React.KeyboardEventHandler<HTMLTextAreaElement>
+type TextAreaBlurHandler = React.FocusEventHandler<HTMLTextAreaElement>
+
 export interface TextAreaState {
   message: string
   command: string
@@ -180,6 +182,7 @@ const TextArea: React.FC<TextAreaProps> = ({
   onChange,
   onSubmit,
   onKeyDown,
+  onBlur,
   messagesContext: propsMessagesContext,
   setMessagesContext: propsSetMessagesContext,
   ...props
@@ -220,16 +223,14 @@ const TextArea: React.FC<TextAreaProps> = ({
         command: newMessageCommand,
         message: newMessage,
       })
-      if (onChange) {
+      onChange &&
         onChange(e, {
           message: newMessage,
           command: newMessageCommand,
         })
-      }
     },
     [setMessagesContext]
   )
-
   const handleTextAreaKeyDown: TextAreaKeyDownHandler = useCallback(
     (e) => {
       if (
@@ -242,17 +243,19 @@ const TextArea: React.FC<TextAreaProps> = ({
         onSubmit(messagesContext)
         e.currentTarget.focus()
       }
-      onKeyDown(e)
+      onKeyDown && onKeyDown(e)
     },
     [messagesContext.message, onSubmit, onKeyDown]
   )
-  const handleTextAreaBlur = useCallback(
-    () =>
+  const handleTextAreaBlur: TextAreaBlurHandler = useCallback(
+    (e) => {
       setLastSelectionRange([
         textAreaRef.current?.selectionStart || 0,
         textAreaRef.current?.selectionEnd || 0,
-      ]),
-    [textAreaRef.current]
+      ])
+      onBlur && onBlur(e)
+    },
+    [textAreaRef.current, onBlur]
   )
 
   /**

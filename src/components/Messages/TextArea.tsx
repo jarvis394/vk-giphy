@@ -7,7 +7,7 @@ import { Icon24Cancel, Icon24Send } from '@vkontakte/icons'
 import { pushMessage } from 'src/store/actions/messages'
 import { useDispatch } from 'react-redux'
 
-const Root = styled('div')({
+const Root = styled('form')({
   width: '100%',
   background: '#FAFBFC',
   borderTop: '1px solid #DCE1E5',
@@ -55,12 +55,12 @@ const Buttons = styled('div')({
 })
 
 const CancelButton = ({ ...props }) => (
-  <IconButton {...props}>
+  <IconButton {...props} type="submit">
     <Icon24Cancel />
   </IconButton>
 )
 const SendButton = ({ ...props }) => (
-  <IconButton {...props}>
+  <IconButton {...props} type="submit">
     <Icon24Send />
   </IconButton>
 )
@@ -76,27 +76,34 @@ const MessagesTextArea = () => {
     e.preventDefault()
     setMessagesContext((prev) => escapeCommand(prev))
   }
-  const handleSendClick = useCallback((e) => {
-    e.preventDefault()
-    if (canSendMessage) {
-      dispatch(
-        pushMessage({
-          text: messagesContext.message.trim(),
-          timestamp: Date.now(),
+  const handleSendClick = useCallback(
+    (e) => {
+      e.preventDefault()
+      if (canSendMessage) {
+        dispatch(
+          pushMessage({
+            text: messagesContext.message.trim(),
+            timestamp: Date.now(),
+          })
+        )
+        setMessagesContext({
+          command: null,
+          message: '',
         })
-      )
-      setMessagesContext({
-        command: null,
-        message: '',
-      })
-    }
-  }, [messagesContext.message, canSendMessage])
+      }
+    },
+    [messagesContext.message, canSendMessage]
+  )
 
   return (
     <Root>
       <MessagesTextAreaInput />
       <Buttons
         onClick={messagesContext.command ? handleCancelClick : handleSendClick}
+        // Fixes soft keyboard hide and show on refocus
+        onTouchEnd={
+          messagesContext.command ? handleCancelClick : handleSendClick
+        }
       >
         <CancelButton active={!!messagesContext.command} />
         <SendButton

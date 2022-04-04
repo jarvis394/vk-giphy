@@ -307,6 +307,8 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     }
   }, [flatData, gridSelection])
 
+  if (state === FetchingState.Error) return null
+
   return (
     <Grid role="grid" ref={gridRef} tabIndex={0} onBlur={handleGridBlur}>
       {showState === ShowState.Hide && <Skeletons />}

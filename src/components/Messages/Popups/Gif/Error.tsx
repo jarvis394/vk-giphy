@@ -4,7 +4,6 @@ import Centered from 'src/components/blocks/Centered'
 import Subtitle from 'src/components/blocks/Subtitle'
 import Title from 'src/components/blocks/Title'
 import useSelector from 'src/hooks/useSelector'
-import { FetchingState } from 'src/types'
 
 const StyledImage = styled('img')({
   width: 48,
@@ -14,9 +13,6 @@ const StyledImage = styled('img')({
 
 const Error = () => {
   const fetchError = useSelector((store) => store.gifs.fetchError)
-  const state = useSelector((store) => store.gifs.state)
-
-  // if (state !== FetchingState.Error) return null
 
   return (
     <Centered>

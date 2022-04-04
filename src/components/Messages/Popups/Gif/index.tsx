@@ -60,6 +60,13 @@ const getCurrentScreen = ({
   command,
 }: GetCurrentScreenProps) => {
   if (!query && command === 'gif') return <EnterQueryScreen />
+  if (state === FetchingState.Error)
+    return (
+      <>
+        <Header query={query} showState={ShowState.Show} />
+        <ErrorScreen />
+      </>
+    )
   if (query && query.length > GIPHY_MAX_QUERY_LENGTH)
     return (
       <>
@@ -75,7 +82,6 @@ const getCurrentScreen = ({
           <NoResultsScreen />
         )}
         <ImageGridScreen query={query} showState={showState} />
-        {state === FetchingState.Error && <ErrorScreen />}
       </>
     )
 }
@@ -102,7 +108,9 @@ const GifPopup = () => {
     })
   )
   const [currentShowState, setCurrentShowState] = useState(showState)
-  const [isShown, setIsShown] = useState(messagesContext.command === 'gif')
+  const [isPopupRootShown, setIsPopupRootShown] = useState(
+    messagesContext.command === 'gif'
+  )
 
   useEffect(() => {
     rootRef.current?.scrollTo(0, 0)
@@ -128,7 +136,7 @@ const GifPopup = () => {
   /** Preserve component state to create seamless inactive transition */
   useEffect(() => {
     if (messagesContext.command === 'gif') {
-      setIsShown(true)
+      setIsPopupRootShown(true)
       setCurrentShowState(showState)
       setCurrentScreen(
         getCurrentScreen({
@@ -142,15 +150,15 @@ const GifPopup = () => {
     } else {
       // We want to reset EnterQuery screen every time popup has been closed
       const id = setTimeout(() => {
-        isShown && setIsShown(false)
+        setIsPopupRootShown(false)
       }, 180) // Transition duration of popup close
       return () => clearTimeout(id)
     }
-  }, [messagesContext.command, query, state, totalCount, showState])
+  }, [messagesContext.message, state, totalCount, showState])
 
   return (
     <Popup active={messagesContext.command === 'gif'}>
-      {isShown && (
+      {isPopupRootShown && (
         <Root isLoading={currentShowState === ShowState.Hide} ref={rootRef}>
           {currentScreen}
         </Root>

@@ -11,6 +11,23 @@ const Root = styled('div')({
   padding: '14px 16px',
   overflowY: 'scroll',
   overflowX: 'hidden',
+  marginRight: 6,
+  '&::-webkit-scrollbar': {
+    background: 'transparent',
+    width: 6,
+    height: 0,
+  },
+  '&::-webkit-scrollbar-thumb': {
+    minHeight: 40,
+    background: '#DAE2EA',
+    borderRadius: 100,
+    '&:active': {
+      background: '#D0D8DF',
+    },
+  },
+  '&::-webkit-scrollbar-track': {
+    margin: '6px 0',
+  },
 })
 
 const Stack = () => {

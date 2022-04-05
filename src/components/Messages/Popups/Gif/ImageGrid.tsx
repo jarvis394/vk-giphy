@@ -124,9 +124,9 @@ const StyledSkeleton = styled(Skeleton)({
 // eslint-disable-next-line react/display-name
 const Skeletons = React.forwardRef<HTMLDivElement>((_, ref) => (
   <>
-    <StyledSkeleton ref={ref} className="horizontal" />
     <StyledSkeleton className="horizontal" />
-    <StyledSkeleton className="vertical" />
+    <StyledSkeleton className="horizontal" />
+    <StyledSkeleton ref={ref} className="vertical" />
     <StyledSkeleton className="horizontal" />
     <StyledSkeleton className="vertical" />
   </>

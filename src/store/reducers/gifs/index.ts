@@ -54,8 +54,19 @@ export default produce((draft, { type, payload }) => {
 
       draft.state = FetchingState.Fetched
       draft.showState = ShowState.Show
-      draft.data[payload.pagination.offset] = payload.data
       draft.source = null
+
+      // In some cases, high `offset` will lead to Giphy API misfunction
+      // and it will return { data: [], pagination: undefined }.
+      // We should ignore the result in this case and set pagination
+      // to the last successful result
+      if (!payload.pagination) {
+        draft.pagination.total_count =
+          draft.pagination.offset + draft.pagination.count
+        return
+      }
+
+      draft.data[payload.pagination.offset] = payload.data
       draft.pagination = payload.pagination
       break
     case GIFS_FETCH_REJECTED:

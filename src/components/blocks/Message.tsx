@@ -78,8 +78,10 @@ const Message: React.FC<{
   )
   const timestamp = useMemo(
     () =>
-      new Date(data.timestamp).toLocaleTimeString([], {
-        timeStyle: 'short',
+      new Date(data.timestamp).toLocaleTimeString(navigator?.language || [], {
+        hour: '2-digit',
+        minute:'2-digit',
+        hour12: false,
       }),
     [data.timestamp]
   )

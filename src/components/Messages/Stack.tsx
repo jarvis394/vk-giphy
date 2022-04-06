@@ -6,7 +6,7 @@ import Message from 'src/components/blocks/Message'
 const Root = styled('div')({
   display: 'flex',
   flexGrow: 1,
-  flexDirection: 'column',
+  flexDirection: 'column-reverse',
   gap: 12,
   padding: '14px 16px',
   overflowY: 'scroll',

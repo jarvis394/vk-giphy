@@ -8,19 +8,19 @@ import { Message as MessageType } from 'src/types'
 import { formatNewLine } from 'src/utils/formatNewLine'
 import isVerticalImage from 'src/utils/isVerticalImage'
 
-const Timestamp = styled('span')({
-  fontSize: 13,
-  lineHeight: '17px',
-  fontWeight: 400,
-  color: '#99A2AD',
-})
-
 const Root = styled('div')({
   display: 'flex',
   gap: 8,
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'flex-end',
+})
+
+const Timestamp = styled('span')({
+  fontSize: 13,
+  lineHeight: '17px',
+  fontWeight: 400,
+  color: '#99A2AD',
 })
 
 const Attachment = styled('picture', {
@@ -80,7 +80,7 @@ const Message: React.FC<{
     () =>
       new Date(data.timestamp).toLocaleTimeString(navigator?.language || [], {
         hour: '2-digit',
-        minute:'2-digit',
+        minute: '2-digit',
         hour12: false,
       }),
     [data.timestamp]

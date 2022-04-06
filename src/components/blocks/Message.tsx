@@ -1,5 +1,5 @@
-import styled from '@emotion/styled/macro'
 import React, { useMemo } from 'react'
+import styled from '@emotion/styled/macro'
 import {
   MESSAGE_ATTACHMENT_HORIZONTAL_MAX_WIDTH,
   MESSAGE_ATTACHMENT_VERTICAL_MAX_WIDTH,

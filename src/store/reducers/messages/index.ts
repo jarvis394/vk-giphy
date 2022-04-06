@@ -8,7 +8,7 @@ const initialState: State = {
 export default produce((draft, { type, payload }) => {
   switch (type) {
     case MESSAGES_PUSH:
-      draft.data.unshift(payload)
+      draft.data.push(payload)
       break
     default:
       break

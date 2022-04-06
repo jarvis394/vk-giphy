@@ -3,10 +3,12 @@ import styled from '@emotion/styled/macro'
 import useSelector from 'src/hooks/useSelector'
 import Message from 'src/components/blocks/Message'
 
+const Spacer = styled('div')({ display: 'flex', flexGrow: 1 })
+
 const Root = styled('div')({
   display: 'flex',
   flexGrow: 1,
-  flexDirection: 'column-reverse',
+  flexDirection: 'column',
   gap: 12,
   padding: '14px 16px',
   overflowY: 'scroll',
@@ -41,6 +43,7 @@ const Stack = () => {
 
   return (
     <Root ref={rootRef}>
+      <Spacer />
       {messages.map((e, i) => (
         <Message data={e} key={i} />
       ))}

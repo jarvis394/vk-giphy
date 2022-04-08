@@ -57,12 +57,12 @@ const Buttons = styled('div')({
 })
 
 const CancelButton = ({ ...props }) => (
-  <IconButton {...props}>
+  <IconButton {...props} aria-label="Cancel command">
     <Icon24Cancel />
   </IconButton>
 )
 const SendButton = ({ ...props }) => (
-  <IconButton {...props}>
+  <IconButton {...props} aria-label="Send message">
     <Icon24Send />
   </IconButton>
 )

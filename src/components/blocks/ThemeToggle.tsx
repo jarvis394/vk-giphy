@@ -41,7 +41,7 @@ const ThemeToggle = () => {
   }
 
   return (
-    <Root onClick={changeTheme}>
+    <Root onClick={changeTheme} aria-label="Change theme">
       {isDarkTheme(theme) ? <Icon28MoonOutline /> : <Icon28SunOutline />}
     </Root>
   )

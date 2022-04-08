@@ -1,11 +1,10 @@
-import React, { useMemo, useState } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 import { APP_MAX_WIDTH } from 'src/config/constants'
 import Messages from './Messages'
 import { Global, ThemeProvider } from '@emotion/react/macro'
-import { generateTheme, ThemeType } from 'src/styles/theme'
-import isDarkTheme from 'src/utils/isDarkTheme'
-import { Icon28SunOutline, Icon28MoonOutline } from '@vkontakte/icons'
+import useSelector from 'src/hooks/useSelector'
+import ThemeToggle from 'src/components/blocks/ThemeToggle'
 
 const Root = styled('div')(({ theme }) => ({
   background: theme.palette.background.paper,
@@ -28,36 +27,13 @@ const Root = styled('div')(({ theme }) => ({
   },
 }))
 
-const ThemeToggle = styled('button')(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  background: 'transparent',
-  border: 'none',
-  width: 56,
-  height: 56,
-  position: 'absolute',
-  right: 16,
-  top: 0,
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 100,
-  [`@media (max-width: ${APP_MAX_WIDTH}px)`]: {
-    right: 0,
-    top: 0,
-    width: 48,
-    height: 48,
-  },
-  '&:active': {
-    color: theme.palette.text.subtitle,
-  },
-  WebkitTapHighlightColor: 'transparent',
-}))
-
 const App = () => {
-  const defaultThemeType: ThemeType = ​window​?.​matchMedia​(​'(prefers-color-scheme: dark)'​)?​.​matches​ ? 'dark' : 'light'
-  const [themeType, setThemeType] = useState<ThemeType>(​defaultThemeType)
-  const theme = useMemo(() => generateTheme(themeType), [themeType])
+  const theme = useSelector((store) => store.theme.theme)
+
+  // TODO: come up with design that fits automatic theme switcher
+  // If uncommented, overrides user's last choice of theme,
+  // which is not good UX.
+  // useAutoThemeChange()
 
   return (
     <ThemeProvider theme={theme}>
@@ -68,13 +44,7 @@ const App = () => {
           },
         }}
       />
-      <ThemeToggle
-        onClick={() =>
-          setThemeType((prev) => (prev === 'light' ? 'dark' : 'light'))
-        }
-      >
-        {isDarkTheme(theme) ? <Icon28MoonOutline /> : <Icon28SunOutline />}
-      </ThemeToggle>
+      <ThemeToggle />
       <Root>
         <Messages>
           <Messages.Stack />

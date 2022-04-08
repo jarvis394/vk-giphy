@@ -22,3 +22,6 @@ export const GIPHY_MAX_QUERY_LENGTH = 50
 export const DEFAULT_UPDATE_INTERVAL = 3600
 
 export const EMOJI_LIST = ['единорог', 'любовь', 'привет', 'обезьянка']
+export const THEME_TYPES = ['light', 'dark']
+
+export const THEME_KEY = 'theme'

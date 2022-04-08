@@ -7,6 +7,7 @@ import Popups from './Popups'
 export interface MessagesState {
   command: string
   message: string
+  lastSelection: [number, number]
 }
 
 export const MessagesContext = React.createContext<{
@@ -18,6 +19,7 @@ const Messages = ({ children }) => {
   const [context, setContext] = useState<MessagesState>({
     command: null,
     message: '',
+    lastSelection: [0, 0],
   })
 
   return (

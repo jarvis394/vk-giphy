@@ -76,7 +76,14 @@ const MessagesTextArea = () => {
   )
   const handleCancelClick = (e) => {
     e.preventDefault()
-    setMessagesContext((prev) => escapeCommand(prev))
+    setMessagesContext((prev) => {
+      const escapedCommand = escapeCommand(prev)
+      const selection = escapedCommand.message.length
+      return {
+        ...escapedCommand,
+        lastSelection: [selection, selection],
+      }
+    })
   }
   const handleSendClick = useCallback(
     (e) => {
@@ -88,10 +95,11 @@ const MessagesTextArea = () => {
             timestamp: Date.now(),
           })
         )
-        setMessagesContext({
+        setMessagesContext((prev) => ({
+          lastSelection: [0, 0],
           command: null,
           message: '',
-        })
+        }))
       }
     },
     [messagesContext.message, canSendMessage]

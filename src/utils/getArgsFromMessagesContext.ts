@@ -1,6 +1,9 @@
 import { MessagesState } from 'src/components/Messages'
 
-const getArgsFromMessagesContext = (messagesContext: MessagesState) => {
+type Context = Omit<MessagesState, 'lastSelection'> & {
+  lastSelection?: unknown
+}
+const getArgsFromMessagesContext = (messagesContext: Context) => {
   return (
     messagesContext.command &&
     messagesContext.message.slice(messagesContext.command.length + 2)

@@ -15,7 +15,7 @@ import { State as GifsStoreState } from 'src/store/reducers/gifs/types'
 import { useTrackVisibility } from 'react-intersection-observer-hook'
 
 const ITEM_HEIGHT = 118
-const SELECTED_CLASS_NAME = 'messages__image-grid-item--selected'
+const SELECTED_CLASS_NAME = 'gifs__image-grid-item--selected'
 const NAVIGATION = {
   Left: 'ArrowLeft',
   Right: 'ArrowRight',
@@ -239,6 +239,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     setMessagesContext({
       command: null,
       message: '',
+      lastSelection: [0, 0],
     })
   }
 

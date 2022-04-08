@@ -198,6 +198,7 @@ const TextArea: React.FC<TextAreaProps> = ({
     useState<MessagesState>({
       message: '',
       command: null,
+      lastSelection: [0, 0],
     })
   const messagesContext = useMemo(
     () => propsMessagesContext || componentMessagesContext,
@@ -208,9 +209,6 @@ const TextArea: React.FC<TextAreaProps> = ({
     [propsSetMessagesContext, setComponentMessagesContext]
   )
   const [messageElement, setMessageElement] = useState<JSX.Element>()
-  const [lastSelectionRange, setLastSelectionRange] = useState<
-    [number, number]
-  >([0, 0])
   const placeholderClasses = useMemo(
     () =>
       !messagesContext.message || messagesContext.message?.length === 0
@@ -228,6 +226,10 @@ const TextArea: React.FC<TextAreaProps> = ({
       setMessagesContext({
         command: newMessageCommand,
         message: newMessage,
+        lastSelection: [
+          textAreaRef.current?.selectionStart || 0,
+          textAreaRef.current?.selectionEnd || 0,
+        ],
       })
       onChange &&
         onChange(e, {
@@ -235,7 +237,7 @@ const TextArea: React.FC<TextAreaProps> = ({
           command: newMessageCommand,
         })
     },
-    [setMessagesContext]
+    [setMessagesContext, textAreaRef.current]
   )
   const handleTextAreaKeyDown: TextAreaKeyDownHandler = useCallback(
     (e) => {
@@ -255,13 +257,16 @@ const TextArea: React.FC<TextAreaProps> = ({
   )
   const handleTextAreaBlur: TextAreaBlurHandler = useCallback(
     (e) => {
-      setLastSelectionRange([
-        textAreaRef.current?.selectionStart || 0,
-        textAreaRef.current?.selectionEnd || 0,
-      ])
+      setMessagesContext((prev) => ({
+        ...prev,
+        lastSelection: [
+          textAreaRef.current?.selectionStart || 0,
+          textAreaRef.current?.selectionEnd || 0,
+        ],
+      }))
       onBlur && onBlur(e)
     },
-    [textAreaRef.current, onBlur]
+    [textAreaRef.current, onBlur, setMessagesContext]
   )
 
   /**
@@ -278,8 +283,8 @@ const TextArea: React.FC<TextAreaProps> = ({
     if (textAreaRef.current && document.activeElement !== textAreaRef.current) {
       textAreaRef.current.focus()
       textAreaRef.current.setSelectionRange(
-        lastSelectionRange[0],
-        lastSelectionRange[1]
+        messagesContext.lastSelection[0],
+        messagesContext.lastSelection[1]
       )
     }
   }, [messagesContext.message, textAreaRef.current])

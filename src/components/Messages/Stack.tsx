@@ -5,7 +5,7 @@ import Message from 'src/components/blocks/Message'
 
 const Spacer = styled('div')({ display: 'flex', flexGrow: 1 })
 
-const Root = styled('div')({
+const Root = styled('div')(({ theme }) => ({
   display: 'flex',
   flexGrow: 1,
   flexDirection: 'column',
@@ -21,16 +21,16 @@ const Root = styled('div')({
   },
   '&::-webkit-scrollbar-thumb': {
     minHeight: 40,
-    background: '#DAE2EA',
+    background: theme.palette.scrollbar.main,
     borderRadius: 100,
     '&:active': {
-      background: '#D0D8DF',
+      background: theme.palette.scrollbar.active,
     },
   },
   '&::-webkit-scrollbar-track': {
     margin: '6px 0',
   },
-})
+}))
 
 const Stack = () => {
   const messages = useSelector((store) => store.messages.data)

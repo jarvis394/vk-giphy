@@ -27,7 +27,7 @@ interface GetCurrentScreenProps {
   command: string
 }
 
-const Root = styled('div')<{ isLoading: boolean }>(({ isLoading }) => ({
+const Root = styled('div')<{ isLoading: boolean }>(({ theme, isLoading }) => ({
   overflow: isLoading ? 'hidden' : 'scroll',
   height: '100%',
   width: 'auto',
@@ -41,10 +41,10 @@ const Root = styled('div')<{ isLoading: boolean }>(({ isLoading }) => ({
   },
   '&::-webkit-scrollbar-thumb': {
     minHeight: 40,
-    background: '#DAE2EA',
+    background: theme.palette.scrollbar.main,
     borderRadius: 100,
     '&:active': {
-      background: '#D0D8DF',
+      background: theme.palette.scrollbar.active,
     },
   },
   '&::-webkit-scrollbar-track': {

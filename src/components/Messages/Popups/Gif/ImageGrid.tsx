@@ -49,7 +49,7 @@ const Grid = styled('div')({
   padding: '12px 6px',
 })
 
-const ItemRoot = styled('picture')({
+const ItemRoot = styled('picture')(({ theme }) => ({
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
@@ -57,7 +57,7 @@ const ItemRoot = styled('picture')({
   height: ITEM_HEIGHT,
   flex: '1 0 auto',
   maxWidth: '100%',
-  backgroundColor: '#E9ECEF',
+  backgroundColor: theme.palette.skeleton.background,
   position: 'relative',
   borderRadius: 2,
   overflow: 'hidden',
@@ -93,21 +93,21 @@ const ItemRoot = styled('picture')({
   [`&.${SELECTED_CLASS_NAME}`]: {
     outline: '2px solid #0077ff',
   },
-})
+}))
 
-const ItemPlaceholder = styled('span')({
+const ItemPlaceholder = styled('span')(({ theme }) => ({
   display: 'flex',
   height: ITEM_HEIGHT,
   flex: '1 0 auto',
   maxWidth: '100%',
-  backgroundColor: '#E9ECEF',
+  backgroundColor: theme.palette.skeleton.background,
   position: 'relative',
   borderRadius: 2,
   '@supports (content-visibility: auto)': {
     contentVisibility: 'auto',
     containIntrinsicSize: ITEM_HEIGHT,
   },
-})
+}))
 
 const StyledSkeleton = styled(Skeleton)({
   borderRadius: 2,

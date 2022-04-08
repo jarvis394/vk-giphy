@@ -11,10 +11,10 @@ const skeletonProgress = keyframes`
   }
 `
 
-const Root = styled('span')({
+const Root = styled('span')(({ theme }) => ({
   width: '100%',
   height: '1em',
-  background: '#E9ECEF',
+  background: theme.palette.skeleton.background,
   borderRadius: 4,
   display: 'inline-block',
   lineHeight: 1,
@@ -30,12 +30,12 @@ const Root = styled('span')({
     backgroundImage: `linear-gradient(
       90deg,
       rgba(255, 255, 255, 0),
-      rgba(255, 255, 255, 0.6),
+      rgba(255, 255, 255, ${theme.palette.skeleton.waveOpacity}),
       rgba(255, 255, 255, 0)
     )`,
     animation: `${skeletonProgress} 1.2s ease-in-out infinite`,
   },
-})
+}))
 
 // eslint-disable-next-line react/display-name
 const Skeleton = React.forwardRef<HTMLDivElement, JSX.IntrinsicElements['div']>(

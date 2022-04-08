@@ -7,25 +7,27 @@ import { Icon24Cancel, Icon24Send } from '@vkontakte/icons'
 import { pushMessage } from 'src/store/actions/messages'
 import { useDispatch } from 'react-redux'
 
-const Root = styled('div')({
+const Root = styled('div')(({ theme }) => ({
   width: '100%',
-  background: '#FAFBFC',
-  borderTop: '1px solid #DCE1E5',
+  background: theme.palette.background.wrapper,
   padding: '13px 16px',
   height: 'fit-content',
   zIndex: 10,
   display: 'flex',
   flexDirection: 'row',
-})
+  ...(theme.palette.type !== 'dark' && {
+    borderTop: '1px solid ' + theme.palette.border.light,
+  }),
+}))
 
 const IconButton = styled('button', {
   shouldForwardProp: (p) => p != 'active',
-})<{ active?: boolean }>(({ active }) => ({
+})<{ active?: boolean }>(({ theme, active }) => ({
   border: 'none',
   padding: '7px',
   background: 'transparent',
-  color: '#818c99',
-  opacity: active ? 0.7 : 0,
+  color: theme.palette.icon.main,
+  opacity: active ? theme.palette.icon.opacity : 0,
   position: 'absolute',
   cursor: 'pointer',
   top: 0,
@@ -34,12 +36,12 @@ const IconButton = styled('button', {
   pointerEvents: active ? 'auto' : 'none',
   '&:disabled': {
     pointerEvents: 'none',
-    opacity: 0.5,
+    opacity: theme.palette.icon.disabledOpacity + ' !important',
     cursor: 'none',
   },
   ...(active && {
     '&:hover': {
-      opacity: 1,
+      opacity: theme.palette.icon.hoverOpacity,
     },
   }),
 }))

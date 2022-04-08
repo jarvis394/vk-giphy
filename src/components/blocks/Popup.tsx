@@ -6,16 +6,16 @@ import {
   POPUP_HEIGHT,
 } from 'src/config/constants'
 
-const Root = styled('div')<{ active: boolean }>(({ active }) => ({
+const Root = styled('div')<{ active: boolean }>(({ theme, active }) => ({
   opacity: active ? 1 : 0,
   bottom: active ? -4 : 4,
   pointerEvents: active ? 'auto' : 'none',
   userSelect: active ? 'auto' : 'none',
   position: 'absolute',
-  backgroundColor: '#FFFFFF',
-  border: '1px solid #F0F4F6',
+  backgroundColor: theme.palette.background.paper,
+  border: '1px solid ' + theme.palette.border.paper,
   borderRadius: 8,
-  boxShadow: '0 4px 16px 0 rgba(0, 0, 0, 0.07)',
+  boxShadow: theme.shadows.popup,
   maxWidth: POPUP_MAX_WIDTH,
   height: POPUP_HEIGHT,
   width: '100%',
@@ -32,8 +32,8 @@ const Root = styled('div')<{ active: boolean }>(({ active }) => ({
     borderRadius: 0,
     boxShadow: 'none',
     border: 'none',
-    borderTop: '1px solid #DCE1E5',
-    borderBottom: '1px solid #DCE1E5',
+    borderTop: '1px solid ' + theme.palette.border.light,
+    borderBottom: '1px solid ' + theme.palette.border.light,
     transition: 'bottom 120ms ease, opacity 120ms ease',
   },
 }))

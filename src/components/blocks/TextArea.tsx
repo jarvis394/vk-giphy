@@ -6,6 +6,7 @@ import {
   TEXTAREA_MAX_LINES,
 } from 'src/config/constants'
 import { formatNewLine } from 'src/utils/formatNewLine'
+import isDarkTheme from 'src/utils/isDarkTheme'
 import { MessagesState } from '../Messages'
 
 type TextAreaChangeHandler = React.ChangeEventHandler<HTMLTextAreaElement>
@@ -37,15 +38,17 @@ const PLACEHOLDER_CLASSES = {
   hidden: 'textarea__placeholder-hidden',
 }
 
-const Root = styled('div')({
+const Root = styled('div')(({ theme }) => ({
   overflowY: 'auto',
   minHeight: MESSAGE_LINE_HEIGHT + 2 * PADDING_VERTICAL,
   maxHeight: MESSAGE_LINE_HEIGHT * TEXTAREA_MAX_LINES + 2 * PADDING_VERTICAL,
-  border: '1px solid #D3D9DE',
+  border:
+    '1px solid ' + (isDarkTheme(theme) ? '#777' : theme.palette.border.main),
+  background: theme.palette.background.input,
   borderRadius: 6,
   width: '100%',
   minWidth: 256,
-})
+}))
 
 const Wrapper = styled('div')({
   position: 'relative',
@@ -53,7 +56,7 @@ const Wrapper = styled('div')({
   minHeight: MESSAGE_LINE_HEIGHT + 2 * PADDING_VERTICAL,
 })
 
-const Message = styled('div')({
+const Message = styled('div')(({ theme }) => ({
   fontFamily: 'Roboto',
   fontSize: 13,
   lineHeight: `${MESSAGE_LINE_HEIGHT}px`,
@@ -69,11 +72,12 @@ const Message = styled('div')({
   width: '100%',
   height: '100%',
   whiteSpace: 'pre-wrap',
-})
+  color: theme.palette.text.primary,
+}))
 
-const PlaceholderText = styled('span')({
+const PlaceholderText = styled('span')(({ theme }) => ({
   fontWeight: 400,
-  color: '#828282',
+  color: theme.palette.text.hint,
   position: 'absolute',
   top: PADDING_VERTICAL,
   transition:
@@ -86,9 +90,10 @@ const PlaceholderText = styled('span')({
     left: PADDING_HORIZONTAL,
     opacity: 1,
   },
-})
+}))
 
-const InnerTextArea = styled('textarea')({
+const InnerTextArea = styled('textarea')(({ theme }) => ({
+  background: theme.palette.background.input,
   fontFamily: 'Roboto',
   fontSize: 13,
   lineHeight: `${MESSAGE_LINE_HEIGHT}px`,
@@ -105,17 +110,18 @@ const InnerTextArea = styled('textarea')({
   width: '100%',
   height: '100%',
   whiteSpace: 'pre-wrap',
+  color: theme.palette.text.primary,
   [`&:focus + ${Message} > ${PlaceholderText}`]: {
-    color: '#B2B2B2',
+    color: theme.palette.text.hintHover,
   },
-})
+}))
 
-const StyledKeyword = styled('span')({
+const StyledKeyword = styled('span')(({ theme }) => ({
   fontWeight: 600,
-  background: 'linear-gradient(135deg, #2EE6A8, #3399FF, #9933FF, #FF3399)',
+  background: theme.palette.rainbowGradient,
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
-})
+}))
 
 const getMessageCommand = (message: string) => {
   const firstWhitespaceIndex = message?.indexOf(' ')

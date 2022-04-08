@@ -16,12 +16,12 @@ const Root = styled('div')({
   alignItems: 'flex-end',
 })
 
-const Timestamp = styled('span')({
+const Timestamp = styled('span')(({ theme }) => ({
   fontSize: 13,
   lineHeight: '17px',
   fontWeight: 400,
-  color: '#99A2AD',
-})
+  color: theme.palette.text.secondary,
+}))
 
 const Attachment = styled('picture', {
   shouldForwardProp: (p) =>
@@ -30,7 +30,7 @@ const Attachment = styled('picture', {
   width: number
   height: number
   maxWidth: number
-}>(({ width, height, maxWidth }) => ({
+}>(({ theme, width, height, maxWidth }) => ({
   aspectRatio: `${width} / ${height}`,
   maxWidth,
   width: 'calc(100% - 32px)',
@@ -40,7 +40,7 @@ const Attachment = styled('picture', {
   justifyContent: 'center',
   minHeight: 64,
   maxHeight: 500,
-  backgroundColor: '#E9ECEF',
+  backgroundColor: theme.palette.skeleton.background,
   position: 'relative',
   borderRadius: 6,
   overflow: 'hidden',
@@ -54,13 +54,13 @@ const Attachment = styled('picture', {
   },
 }))
 
-const Text = styled('p')({
+const Text = styled('p')(({ theme }) => ({
   margin: 0,
   fontSize: 13,
   lineHeight: '17px',
   fontWeight: 400,
-  color: '#000000',
-})
+  color: theme.palette.text.primary,
+}))
 
 const Message: React.FC<{
   data: MessageType

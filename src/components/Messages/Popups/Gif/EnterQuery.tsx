@@ -108,7 +108,7 @@ const Emoji = styled('div')({
   animation: `${emojisCarousel} 15s cubic-bezier(1, 0, 0, 1) infinite`,
 })
 
-const EmojiTextBox = styled('span')({
+const EmojiTextBox = styled('span')(({ theme }) => ({
   display: 'inline-flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -119,12 +119,12 @@ const EmojiTextBox = styled('span')({
   '& span': {
     lineHeight: '19px',
     position: 'relative',
-    background: 'linear-gradient(135deg, #2EE6A8, #3399FF, #9933FF, #FF3399)',
+    background: theme.palette.rainbowGradient,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     animation: `${textCarousel} 15s cubic-bezier(1, 0, 0, 1) infinite`,
   },
-})
+}))
 
 const EnterQuery = () => {
   return (

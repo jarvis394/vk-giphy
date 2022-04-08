@@ -20,19 +20,19 @@ const Root = styled('div')({
   alignItems: 'center',
 })
 
-const Title = styled('p')({
+const Title = styled('p')(({ theme }) => ({
   margin: 0,
-  color: '#B0B5BA',
+  color: theme.palette.text.subtitle,
   fontSize: 13,
   fontWeight: 500,
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
-})
+}))
 
-const StyledSpinner = styled(Spinner)({
-  color: '#B0B5BA',
-})
+const StyledSpinner = styled(Spinner)(({ theme }) => ({
+  color: theme.palette.text.subtitle,
+}))
 
 const Header: React.FC<HeaderProps> = ({
   query: propsQuery,

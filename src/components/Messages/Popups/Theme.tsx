@@ -1,7 +1,12 @@
 import styled from '@emotion/styled/macro'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Popup from 'src/components/blocks/Popup'
-import { COMMAND_PREFIX, THEME_NAMES, THEME_TYPES } from 'src/config/constants'
+import {
+  APP_MAX_WIDTH,
+  COMMAND_PREFIX,
+  THEME_NAMES,
+  THEME_TYPES,
+} from 'src/config/constants'
 import useMessagesContext from 'src/hooks/useMessagesContext'
 import { ThemeType } from 'src/styles/theme'
 import { alpha } from 'src/utils/colorManipulation'
@@ -23,6 +28,9 @@ const StyledPopup = styled(Popup)({
   [`&:not(:focus) .${SELECTED_CLASS_NAME}`]: {
     background: 'transparent',
   },
+  [`@media (max-width: ${APP_MAX_WIDTH}px)`]: {
+    width: '100%',
+  },
 })
 
 const List = styled('div')({
@@ -43,6 +51,7 @@ const ThemeItem = styled('button')(({ theme }) => ({
   cursor: 'pointer',
   border: 'none',
   background: 'transparent',
+  WebkitTapHighlightColor: alpha(theme.palette.text.primary, 0.05),
   '&:hover': {
     background: alpha(theme.palette.text.primary, 0.02),
   },
@@ -51,6 +60,9 @@ const ThemeItem = styled('button')(({ theme }) => ({
   },
   [`&.${SELECTED_CLASS_NAME}`]: {
     background: alpha(theme.palette.text.primary, 0.05),
+  },
+  [`@media (max-width: ${APP_MAX_WIDTH}px)`]: {
+    minWidth: '100%',
   },
 }))
 

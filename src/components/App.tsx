@@ -55,7 +55,7 @@ const ThemeToggle = styled('button')(({ theme }) => ({
 }))
 
 const App = () => {
-  const [themeType, setThemeType] = useState<ThemeType>('dark')
+  const [themeType, setThemeType] = useState<ThemeType>('light')
   const theme = useMemo(() => generateTheme(themeType), [themeType])
 
   return (

@@ -4,34 +4,43 @@ import Popup from 'src/components/blocks/Popup'
 import {
   APP_MAX_WIDTH,
   COMMAND_PREFIX,
-  THEME_NAMES,
-  THEME_TYPES,
+  THEME_NAMES as CONFIG_THEME_NAMES,
+  THEME_TYPES as CONFIG_THEME_TYPES,
 } from 'src/config/constants'
 import useMessagesContext from 'src/hooks/useMessagesContext'
-import { ThemeType } from 'src/styles/theme'
+import { AutoThemeType, ThemeType } from 'src/styles/theme'
 import { alpha } from 'src/utils/colorManipulation'
 import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
 
+const THEME_TYPES: (ThemeType | AutoThemeType)[] = [...CONFIG_THEME_TYPES, 'auto']
+const THEME_NAMES: Record<ThemeType | AutoThemeType, string> = {
+  ...CONFIG_THEME_NAMES,
+  auto: 'Как в системе',
+}
 const SELECTED_CLASS_NAME = 'themes__item--selected'
 const NAVIGATION = {
   Up: 'ArrowUp',
   Down: 'ArrowDown',
 }
 
-const StyledPopup = styled(Popup)({
+const StyledPopup = styled(Popup)(({ theme }) => ({
   height: 'auto !important',
   maxWidth: 'auto',
   width: 'auto',
   '&:focus': {
     outline: 'none',
+    border: '1px solid ' + alpha(theme.palette.text.primary, 0.12),
   },
   [`&:not(:focus) .${SELECTED_CLASS_NAME}`]: {
     background: 'transparent',
+    '&:hover': {
+      background: alpha(theme.palette.text.primary, 0.02),
+    },
   },
   [`@media (max-width: ${APP_MAX_WIDTH}px)`]: {
     width: '100%',
   },
-})
+}))
 
 const List = styled('div')({
   display: 'flex',
@@ -73,16 +82,22 @@ const ThemeTypeSpan = styled('span')(({ theme }) => ({
 const ThemePopup = () => {
   const [messagesContext, setMessagesContext] = useMessagesContext()
   const [query, setQuery] = useState(
-    getArgsFromMessagesContext(messagesContext)?.trim()
+    getArgsFromMessagesContext(messagesContext)
   )
   const [selected, setSelected] = useState(0)
-  const listRef = useRef<HTMLDivElement>()
-  const filteredThemes = useMemo(
-    () => THEME_TYPES.filter((e) => e.startsWith(query)),
-    [query]
+  const [filteredThemes, setFilteredThemes] = useState(
+    THEME_TYPES.filter((e) => e.startsWith(query?.trim()))
   )
+  const [shouldAnimateOut, setShouldAnimateOut] = useState(
+    filteredThemes.length === 0
+  )
+  const isActive = useMemo(
+    () => messagesContext.command === 'theme' && !shouldAnimateOut,
+    [shouldAnimateOut, messagesContext.command]
+  )
+  const listRef = useRef<HTMLDivElement>()
 
-  const handleItemClick = (item: ThemeType) => {
+  const handleItemClick = (item: ThemeType | AutoThemeType) => {
     const message = COMMAND_PREFIX + 'theme ' + item
     setSelected(THEME_TYPES.findIndex((e) => e === item))
     setMessagesContext({
@@ -124,24 +139,31 @@ const ThemePopup = () => {
   /** Remembers query to make seamless show/hide transition */
   useEffect(() => {
     if (messagesContext.command === 'theme') {
-      setQuery(getArgsFromMessagesContext(messagesContext)?.trim())
+      setQuery(getArgsFromMessagesContext(messagesContext))
     }
   }, [messagesContext.message])
 
+  useEffect(() => {
+    const newFilteredThemes = THEME_TYPES.filter((e) =>
+      e.startsWith(query?.trim())
+    )
+    if (newFilteredThemes.length === 0) {
+      setShouldAnimateOut(true)
+    } else {
+      setShouldAnimateOut(false)
+      setFilteredThemes(newFilteredThemes)
+    }
+  }, [query])
+
   return (
-    <StyledPopup
-      ref={listRef}
-      active={
-        messagesContext.command === 'theme' && filteredThemes.length !== 0
-      }
-      tabIndex={messagesContext.command === 'theme' ? 0 : -1}
-    >
+    <StyledPopup ref={listRef} active={isActive} tabIndex={isActive ? 0 : -1}>
       <List>
         {filteredThemes.map((e, i) => (
           <ThemeItem
             role="button"
             tabIndex={-1}
             onClick={() => handleItemClick(e)}
+            onMouseDown={(event) => event.preventDefault()}
             key={i}
             {...(selected === i && {
               className: SELECTED_CLASS_NAME,

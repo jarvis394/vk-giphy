@@ -1,14 +1,12 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import TextArea, { TextAreaState } from 'src/components/blocks/TextArea'
-import { THEME_TYPES } from 'src/config/constants'
 import useMessagesContext from 'src/hooks/useMessagesContext'
 import { pushMessage } from 'src/store/actions/messages'
-import { setTheme } from 'src/store/actions/theme'
+import { changeAutoTheme, setTheme } from 'src/store/actions/theme'
 import { isThemeType } from 'src/styles/theme'
 import escapeCommand from 'src/utils/escapeCommand'
 import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
-import { MessagesState } from '.'
 
 /**
  * Renders textarea component with commands' keyword highlighing feature
@@ -26,8 +24,13 @@ const MessagesTextAreaInput = () => {
   const dispatch = useDispatch()
   const handleSubmit = (state: TextAreaState) => {
     const query = getArgsFromMessagesContext(state)?.trim()
-    if (state.command === 'theme' && query && isThemeType(query)) {
-      dispatch(setTheme(query))
+    if (state.command === 'theme' && query) {
+      if (isThemeType(query)) {
+        console.log(query, isThemeType(query), isThemeType('dadsd'))
+        dispatch(setTheme(query))
+      } else if (query === 'auto') {
+        dispatch(changeAutoTheme())
+      }
     } else {
       dispatch(
         pushMessage({

@@ -4,7 +4,7 @@ import { APP_MAX_WIDTH } from 'src/config/constants'
 import Messages from './Messages'
 import { Global, ThemeProvider } from '@emotion/react/macro'
 import useSelector from 'src/hooks/useSelector'
-import ThemeToggle from 'src/components/blocks/ThemeToggle'
+import useAutoThemeChange from 'src/hooks/useAutoThemeChange'
 
 const Root = styled('div')(({ theme }) => ({
   background: theme.palette.background.paper,
@@ -30,10 +30,8 @@ const Root = styled('div')(({ theme }) => ({
 const App = () => {
   const theme = useSelector((store) => store.theme.theme)
 
-  // TODO: come up with design that fits automatic theme switcher
-  // If uncommented, overrides user's last choice of theme,
-  // which is not good UX.
-  // useAutoThemeChange()
+  // Changes theme automatically if user set autoThemeChange to true
+  useAutoThemeChange()
 
   return (
     <ThemeProvider theme={theme}>
@@ -45,7 +43,6 @@ const App = () => {
           },
         }}
       />
-      <ThemeToggle />
       <Root>
         <Messages>
           <Messages.Stack />

@@ -1,4 +1,4 @@
-import { ThemeType } from 'src/styles/theme'
+import { AutoThemeType, ThemeType } from 'src/styles/theme'
 
 export const GIPHY_API_URL = 'https://api.giphy.com/v1/gifs/'
 
@@ -24,10 +24,11 @@ export const GIPHY_MAX_QUERY_LENGTH = 50
 export const DEFAULT_UPDATE_INTERVAL = 3600
 
 export const EMOJI_LIST = ['единорог', 'любовь', 'привет', 'обезьянка']
-export const THEME_TYPES: ThemeType[] = ['light', 'dark']
+export const THEME_TYPES: (ThemeType)[] = ['light', 'dark']
 export const THEME_NAMES: Record<ThemeType, string> = {
   light: 'Светлая тема',
   dark: 'Темная тема',
 }
 
 export const THEME_KEY = 'theme'
+export const AUTO_THEME_CHANGE_KEY = 'autoThemeChange'

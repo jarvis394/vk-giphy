@@ -45,6 +45,7 @@ declare module '@emotion/react' {
 }
 
 export type ThemeType = 'light' | 'dark'
+export type AutoThemeType = 'auto'
 
 export const isThemeType = (s: string): s is ThemeType =>
   THEME_TYPES.some((e) => e === s)

@@ -22,11 +22,11 @@ import getArgsFromMessagesContext from 'src/utils/getArgsFromMessagesContext'
 const MessagesTextAreaInput = () => {
   const [messagesContext, setMessagesContext] = useMessagesContext()
   const dispatch = useDispatch()
+  
   const handleSubmit = (state: TextAreaState) => {
     const query = getArgsFromMessagesContext(state)?.trim()
     if (state.command === 'theme' && query) {
       if (isThemeType(query)) {
-        console.log(query, isThemeType(query), isThemeType('dadsd'))
         dispatch(setTheme(query))
       } else if (query === 'auto') {
         dispatch(changeAutoTheme())
@@ -45,6 +45,7 @@ const MessagesTextAreaInput = () => {
       lastSelection: [0, 0],
     })
   }
+  
   const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (
     e
   ) => {

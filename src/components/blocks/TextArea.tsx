@@ -48,6 +48,19 @@ const Root = styled('div')(({ theme }) => ({
   borderRadius: 6,
   width: '100%',
   minWidth: 256,
+  '&::-webkit-scrollbar': {
+    background: 'transparent',
+    width: 6,
+    height: 0,
+  },
+  '&::-webkit-scrollbar-thumb': {
+    minHeight: 40,
+    background: theme.palette.scrollbar.main,
+    borderRadius: 100,
+    '&:active': {
+      background: theme.palette.scrollbar.active,
+    },
+  },
 }))
 
 const Wrapper = styled('div')({
@@ -111,6 +124,7 @@ const InnerTextArea = styled('textarea')(({ theme }) => ({
   height: '100%',
   whiteSpace: 'pre-wrap',
   color: theme.palette.text.primary,
+  overflow: 'hidden',
   [`&:focus + ${Message} > ${PlaceholderText}`]: {
     color: theme.palette.text.hintHover,
   },

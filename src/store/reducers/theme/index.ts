@@ -8,14 +8,15 @@ const preferredThemeType = global?.matchMedia(preferDarkQuery)?.matches
   ? 'dark'
   : 'light'
 const localStorageThemeType = localStorage.getItem(THEME_KEY)
-const localStorageAutoThemeChange = localStorage.getItem(AUTO_THEME_CHANGE_KEY) === 'true'
+const localStorageAutoThemeChange =
+  localStorage.getItem(AUTO_THEME_CHANGE_KEY) === 'true'
 const themeType = isThemeType(localStorageThemeType)
   ? localStorageThemeType
   : preferredThemeType
 const initialState: State = {
   theme: generateTheme(themeType),
   themeType,
-  autoThemeChange: localStorageAutoThemeChange
+  autoThemeChange: localStorageAutoThemeChange,
 }
 
 export default produce((draft, { type, payload }) => {
@@ -23,6 +24,8 @@ export default produce((draft, { type, payload }) => {
     case THEME_SET:
       draft.themeType = payload
       draft.theme = generateTheme(payload)
+      draft.autoThemeChange = false
+      localStorage.setItem(AUTO_THEME_CHANGE_KEY, 'false')
       localStorage.setItem(THEME_KEY, payload)
       break
     case THEME_AUTO_CHANGE_SET:

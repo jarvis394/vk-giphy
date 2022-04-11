@@ -115,7 +115,7 @@ const ThemePopup = () => {
   const handleListKeyboardNavigation = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === NAVIGATION.Up) {
-        setSelected((prev) => prev - 1 < 0 ? filteredThemes.length - 1 : prev - 1))
+        setSelected((prev) => prev - 1 < 0 ? filteredThemes.length - 1 : prev - 1)
       } else if (e.key === NAVIGATION.Down) {
         setSelected((prev) => (prev + 1) % filteredThemes.length)
       } else if (e.key === 'Enter') {

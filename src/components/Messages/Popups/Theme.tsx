@@ -30,6 +30,10 @@ const StyledPopup = styled(Popup)(({ theme }) => ({
   '&:focus': {
     outline: 'none',
     border: '1px solid ' + alpha(theme.palette.text.primary, 0.12),
+    [`@media (max-width: ${APP_MAX_WIDTH}px)`]: {
+      border: 'none',
+      borderTop: '1px solid ' + alpha(theme.palette.text.primary, 0.12),
+    },
   },
   [`&:not(:focus) .${SELECTED_CLASS_NAME}`]: {
     background: 'transparent',

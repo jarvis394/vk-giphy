@@ -8,6 +8,7 @@
     "@vkontakte/icons": "^1.147.0",
     "axios": "^0.26.1",
     "immer": "^9.0.12",
+    "is-mobile": "^3.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-intersection-observer-hook": "^2.0.3",

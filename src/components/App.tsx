@@ -1,10 +1,11 @@
 import React from 'react'
 import styled from '@emotion/styled/macro'
-import { APP_MAX_WIDTH } from 'src/config/constants'
+import { APP_MAX_WIDTH, CHROME_ADRESS_BAR } from 'src/config/constants'
 import Messages from './Messages'
 import { Global, ThemeProvider } from '@emotion/react/macro'
 import useSelector from 'src/hooks/useSelector'
 import useAutoThemeChange from 'src/hooks/useAutoThemeChange'
+import isMobile from 'is-mobile'
 
 const Root = styled('div')(({ theme }) => ({
   background: theme.palette.background.paper,
@@ -22,7 +23,7 @@ const Root = styled('div')(({ theme }) => ({
     margin: '0 auto',
     padding: 0,
     borderRadius: 0,
-    height: '100vh',
+    height: `calc(100vh - ${isMobile() ? CHROME_ADRESS_BAR : 0}px)`,
     border: 'none',
   },
 }))

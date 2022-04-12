@@ -1,4 +1,5 @@
 import { THEME_TYPES } from 'src/config/constants'
+import { Theme } from '@emotion/react'
 
 declare module '@emotion/react' {
   export interface Theme {
@@ -37,6 +38,9 @@ declare module '@emotion/react' {
         active: string
       }
       rainbowGradient: string
+      primary: {
+        main: string
+      }
     }
     shadows: {
       popup: string
@@ -49,6 +53,11 @@ export type AutoThemeType = 'auto'
 
 export const isThemeType = (s: string): s is ThemeType =>
   THEME_TYPES.some((e) => e === s)
+
+const PRIMARY_COLOR: Record<ThemeType, string> = {
+  light: '#2979ff',
+  dark: '#82b1ff',
+}
 
 const PAPER_BACKGROUND_COLOR: Record<ThemeType, string> = {
   light: '#ffffff',
@@ -140,7 +149,7 @@ const RAINBOW_GRADIENT: Record<ThemeType, string> = {
   dark: 'linear-gradient(135deg, #4eff89, #4bceff, #c84cff, #ff0e87)',
 }
 
-export const generateTheme = (type: ThemeType = 'light') => {
+export const generateTheme = (type: ThemeType = 'light'): Theme => {
   if (!isThemeType(type))
     throw new Error(
       `\`type\` must be one of keys, typed as ThemeType: ${THEME_TYPES.join(
@@ -150,6 +159,9 @@ export const generateTheme = (type: ThemeType = 'light') => {
   return {
     palette: {
       type,
+      primary: {
+        main: PRIMARY_COLOR[type],
+      },
       background: {
         default: DEFAULT_BACKGROUND_COLOR[type],
         paper: PAPER_BACKGROUND_COLOR[type],

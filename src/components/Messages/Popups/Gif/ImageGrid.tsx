@@ -91,7 +91,7 @@ const ItemRoot = styled('picture')(({ theme }) => ({
     outline: 'none',
   },
   [`&.${SELECTED_CLASS_NAME}`]: {
-    outline: '2px solid #0077ff',
+    outline: '2px solid ' + theme.palette.primary.main,
   },
 }))
 

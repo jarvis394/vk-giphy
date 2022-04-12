@@ -91,6 +91,9 @@ const CommandKeyword = styled('button')(({ theme }) => ({
   cursor: 'pointer',
   border: 'none',
   position: 'relative',
+  '&:focus': {
+    outline: '2px solid ' + theme.palette.primary.main,
+  },
 }))
 
 const CommandKeywordsContainer = styled('div')({
@@ -130,9 +133,12 @@ const Stack = () => {
               <CommandKeyword
                 tabIndex={messages.length === 0 ? 0 : -1}
                 onClick={() => enterCommand(e)}
+                // Fixes soft keyboard hide and show on refocus
+                onMouseDown={(event) => event.preventDefault()}
                 key={i}
               >
-                {COMMAND_PREFIX}{e}
+                {COMMAND_PREFIX}
+                {e}
               </CommandKeyword>
             ))}
           </CommandKeywordsContainer>

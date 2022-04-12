@@ -1,4 +1,4 @@
-import { AutoThemeType, ThemeType } from 'src/styles/theme'
+import { ThemeType } from 'src/styles/theme'
 
 export const GIPHY_API_URL = 'https://api.giphy.com/v1/gifs/'
 
@@ -7,6 +7,7 @@ export const COMMAND_PREFIX = '/'
 /** Holds all supported keywords for commands */
 export const COMMAND_KEYWORDS = new Set(['gif', 'test', 'theme'])
 
+export const CHROME_ADRESS_BAR = 56
 export const APP_MAX_WIDTH = 490
 export const MESSAGE_ATTACHMENT_VERTICAL_MAX_WIDTH = 256
 export const MESSAGE_ATTACHMENT_HORIZONTAL_MAX_WIDTH = 312

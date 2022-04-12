@@ -39,6 +39,9 @@ const IconButton = styled('button', {
     opacity: theme.palette.icon.disabledOpacity + ' !important',
     cursor: 'none',
   },
+  '&:focus': {
+    outline: '2px solid ' + theme.palette.primary.main,
+  },
   ...(active && {
     '&:hover': {
       opacity: theme.palette.icon.hoverOpacity,

@@ -298,6 +298,10 @@ const ImageGrid: React.FC<ImageGridProps> = ({
             return
           }
         }
+        // Fallback if appropriate element was not found
+        setGridCurrentSelected((prev) =>
+          Math.min(prev + 3, flatData.length - 1)
+        )
       } else if (e.key === NAVIGATION.Up) {
         e.preventDefault()
         const currentRect = getItemBoundingRect(gridCurrentSelected)
@@ -312,6 +316,8 @@ const ImageGrid: React.FC<ImageGridProps> = ({
             return
           }
         }
+        // Fallback if appropriate element was not found
+        setGridCurrentSelected((prev) => Math.max(prev - 3, 0))
       } else if (e.key === NAVIGATION.Enter) {
         handleItemClick(e, flatData[gridCurrentSelected])
       }

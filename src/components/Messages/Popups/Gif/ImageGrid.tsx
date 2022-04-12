@@ -19,6 +19,9 @@ const SELECTED_CLASS_NAME = 'gifs__image-grid-item--selected'
 const NAVIGATION = {
   Left: 'ArrowLeft',
   Right: 'ArrowRight',
+  Up: 'ArrowUp',
+  Down: 'ArrowDown',
+  Enter: 'Enter',
 }
 
 interface ImageGridProps {
@@ -30,6 +33,7 @@ interface ItemProps {
   data: GifResult['data']
   handleItemKeyDown: ItemKeyDownHandler
   handleItemClick: HandleItemClick
+  isSelected: boolean
 }
 
 type HandleItemClick = (
@@ -139,12 +143,20 @@ const ItemUnmemoized: React.FC<ItemProps> = ({
   data,
   handleItemKeyDown,
   handleItemClick,
+  isSelected,
 }) => {
   const id = data.id.toString()
   const image = data.images.fixed_height_small
   const [ref, { isVisible }] = useTrackVisibility({
     rootMargin: '200px',
   })
+
+  useEffect(() => {
+    isSelected &&
+      document?.getElementById(id)?.scrollIntoView({
+        block: 'center',
+      })
+  }, [isSelected])
 
   return isVisible ? (
     <ItemRoot
@@ -153,6 +165,7 @@ const ItemUnmemoized: React.FC<ItemProps> = ({
       key={id}
       id={id}
       ref={ref}
+      className={isSelected ? SELECTED_CLASS_NAME : ''}
       onKeyDown={(event) => handleItemKeyDown(event, data)}
       onClick={(event) => handleItemClick(event, data)}
       // Fixes soft keyboard hide and show on refocus
@@ -166,6 +179,7 @@ const ItemUnmemoized: React.FC<ItemProps> = ({
     </ItemRoot>
   ) : (
     <ItemPlaceholder
+      className={isSelected ? SELECTED_CLASS_NAME : ''}
       id={id}
       ref={ref}
       style={{
@@ -194,10 +208,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     [propsShowState, storeShowState]
   )
   const [currentOffset, setCurrentOffset] = useState(0)
-  const [gridSelection, setGridSelection] = useState({
-    prev: 0,
-    current: 0,
-  })
+  const [gridCurrentSelected, setGridCurrentSelected] = useState(0)
   const gridRef = useRef<HTMLDivElement>()
   const hasNext = currentOffset + GIPHY_FETCH_GIFS_COUNT < totalCount
   const dispatch = useDispatch()
@@ -212,7 +223,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
   }, [query, currentOffset])
   const scrollEndRef = useInfiniteScroll({
     loading: state === FetchingState.Fetching,
-    rootMargin: '100px',
+    rootMargin: `${ITEM_HEIGHT * 3 + 16}px 0px`,
     hasNext,
     onLoadMore: handleLoadMoreGIFs,
   })
@@ -246,41 +257,67 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     })
   }
 
+  /** Handles sending GIF on Enter keypress */
   const handleItemKeyDown: ItemKeyDownHandler = (event, item) => {
-    if (event.key === 'Enter') {
+    if (event.key === NAVIGATION.Enter) {
       handleItemClick(event, item)
     }
+  }
+
+  /**
+   * Finds item's bounding client rect
+   * @param i Index of item in `flatData` array
+   */
+  const getItemBoundingRect = (i: number) => {
+    const el = document.getElementById(flatData[i].id.toString())
+    return el?.getBoundingClientRect()
   }
 
   /** Handles keyboard arrow presses to navigate through grid */
   const handleGridKeyboardNavigation = useCallback(
     (e) => {
-      if (!flatData) return null
-      if (e.key === NAVIGATION.Left && gridSelection.current !== 0) {
-        setGridSelection((prev) => ({
-          prev: prev.current,
-          current: prev.current - 1,
-        }))
+      if (!flatData) return
+      if (e.key === NAVIGATION.Left && gridCurrentSelected !== 0) {
+        setGridCurrentSelected((prev) => prev - 1)
       } else if (
         e.key === NAVIGATION.Right &&
-        gridSelection.current !== flatData.length - 1
+        gridCurrentSelected !== flatData.length - 1
       ) {
-        setGridSelection((prev) => ({
-          prev: prev.current,
-          current: prev.current + 1,
-        }))
-      } else if (e.key === 'Enter') {
-        handleItemClick(e, flatData[gridSelection.current])
+        setGridCurrentSelected((prev) => prev + 1)
+      } else if (e.key === NAVIGATION.Down) {
+        e.preventDefault()
+        const currentRect = getItemBoundingRect(gridCurrentSelected)
+
+        for (let i = gridCurrentSelected + 1; i < flatData.length; i++) {
+          const elRect = getItemBoundingRect(i)
+          if (
+            currentRect.y + ITEM_HEIGHT <= elRect.y &&
+            currentRect.x - currentRect.width / 2 <= elRect.x
+          ) {
+            setGridCurrentSelected(i)
+            return
+          }
+        }
+      } else if (e.key === NAVIGATION.Up) {
+        e.preventDefault()
+        const currentRect = getItemBoundingRect(gridCurrentSelected)
+
+        for (let i = gridCurrentSelected - 1; i >= 0; i--) {
+          const elRect = getItemBoundingRect(i)
+          if (
+            currentRect.y - ITEM_HEIGHT >= elRect.y &&
+            currentRect.x + currentRect.width / 2 >= elRect.x
+          ) {
+            setGridCurrentSelected(i)
+            return
+          }
+        }
+      } else if (e.key === NAVIGATION.Enter) {
+        handleItemClick(e, flatData[gridCurrentSelected])
       }
     },
-    [flatData, gridSelection]
+    [flatData, gridCurrentSelected]
   )
-
-  /** Removes selection on grid blur */
-  const handleGridBlur = () => {
-    // const el = document.getElementsByClassName(SELECTED_CLASS_NAME)[0]
-    // el?.classList?.remove(SELECTED_CLASS_NAME)
-  }
 
   /** Registers grid arrow navigation handler */
   useEffect(() => {
@@ -291,37 +328,19 @@ const ImageGrid: React.FC<ImageGridProps> = ({
         handleGridKeyboardNavigation
       )
     }
-  }, [gridRef.current, flatData, gridSelection])
-
-  useEffect(() => {
-    if (flatData && flatData.length > 0) {
-      const currentId = flatData[gridSelection.current].id.toString()
-      const prevId = flatData[gridSelection.prev].id.toString()
-      const prev = document.getElementById(prevId)
-      const current = document.getElementById(currentId)
-      current.classList.add(SELECTED_CLASS_NAME)
-
-      // Do not scroll into item view if we first time get focus,
-      // therefore not messing up user's first scroll
-      if (gridSelection.current !== gridSelection.prev) {
-        current.scrollIntoView({
-          block: 'center',
-        })
-        prev.classList.remove(SELECTED_CLASS_NAME)
-      }
-    }
-  }, [flatData, gridSelection])
+  }, [gridRef.current, flatData, gridCurrentSelected])
 
   if (state === FetchingState.Error) return null
 
   return (
-    <Grid role="grid" ref={gridRef} tabIndex={0} onBlur={handleGridBlur}>
+    <Grid role="grid" ref={gridRef} tabIndex={0}>
       {showState === ShowState.Hide && <Skeletons />}
       {showState === ShowState.Show &&
-        flatData.map((e) => (
+        flatData.map((e, i) => (
           <Item
             handleItemClick={handleItemClick}
             handleItemKeyDown={handleItemKeyDown}
+            isSelected={gridCurrentSelected === i}
             key={e.id}
             data={e}
           />

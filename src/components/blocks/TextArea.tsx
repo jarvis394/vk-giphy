@@ -43,7 +43,10 @@ const Root = styled('div')(({ theme }) => ({
   minHeight: MESSAGE_LINE_HEIGHT + 2 * PADDING_VERTICAL,
   maxHeight: MESSAGE_LINE_HEIGHT * TEXTAREA_MAX_LINES + 2 * PADDING_VERTICAL,
   border:
-    '1px solid ' + (isDarkTheme(theme) ? '#777' : theme.palette.border.main),
+    '1px solid ' +
+    (isDarkTheme(theme)
+      ? theme.palette.border.light
+      : theme.palette.border.main),
   background: theme.palette.background.input,
   borderRadius: 6,
   width: '100%',

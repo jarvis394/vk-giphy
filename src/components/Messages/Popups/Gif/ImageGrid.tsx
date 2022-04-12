@@ -42,12 +42,18 @@ type ItemKeyDownHandler = (
   item: GifResult['data']
 ) => void
 
-const Grid = styled('div')({
+const Grid = styled('div')(({ theme }) => ({
   display: 'flex',
   flexWrap: 'wrap',
   gap: 8,
   padding: '12px 6px',
-})
+  [`&:focus-visible .${SELECTED_CLASS_NAME}`]: {
+    outline: '2px solid ' + theme.palette.primary.main,
+  },
+  '&:focus': {
+    outline: 'none',
+  },
+}))
 
 const ItemRoot = styled('picture')(({ theme }) => ({
   cursor: 'pointer',
@@ -89,9 +95,6 @@ const ItemRoot = styled('picture')(({ theme }) => ({
   },
   '&:focus': {
     outline: 'none',
-  },
-  [`&.${SELECTED_CLASS_NAME}`]: {
-    outline: '2px solid ' + theme.palette.primary.main,
   },
 }))
 
@@ -275,8 +278,8 @@ const ImageGrid: React.FC<ImageGridProps> = ({
 
   /** Removes selection on grid blur */
   const handleGridBlur = () => {
-    const el = document.getElementsByClassName(SELECTED_CLASS_NAME)[0]
-    el?.classList?.remove(SELECTED_CLASS_NAME)
+    // const el = document.getElementsByClassName(SELECTED_CLASS_NAME)[0]
+    // el?.classList?.remove(SELECTED_CLASS_NAME)
   }
 
   /** Registers grid arrow navigation handler */
@@ -297,7 +300,6 @@ const ImageGrid: React.FC<ImageGridProps> = ({
       const prev = document.getElementById(prevId)
       const current = document.getElementById(currentId)
       current.classList.add(SELECTED_CLASS_NAME)
-      prev.classList.remove(SELECTED_CLASS_NAME)
 
       // Do not scroll into item view if we first time get focus,
       // therefore not messing up user's first scroll
@@ -305,6 +307,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
         current.scrollIntoView({
           block: 'center',
         })
+        prev.classList.remove(SELECTED_CLASS_NAME)
       }
     }
   }, [flatData, gridSelection])
